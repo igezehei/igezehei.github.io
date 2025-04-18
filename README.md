@@ -1,2 +1,2 @@
-# igezehei.github.io
+# Welcome to my page
 Landing page
