@@ -1,104 +1,124 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Initial Checkin</title>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-* {
-  box-sizing: border-box;
-}
-
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-/* Style the header */
-header {
-  background-color: #666;
-  padding: 30px;
-  text-align: center;
-  font-size: 35px;
-  color: white;
-}
-
-/* Create two columns/boxes that floats next to each other */
-nav {
-  float: left;
-  width: 30%;
-  height: 300px; /* only for demonstration, should be removed */
-  background: #ccc;
-  padding: 20px;
-}
-
-/* Style the list inside the menu */
-nav ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-article {
-  float: left;
-  padding: 20px;
-  width: 70%;
-  background-color: #f1f1f1;
-  height: 300px; /* only for demonstration, should be removed */
-}
-
-/* Clear floats after the columns */
-section::after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
-/* Style the footer */
-footer {
-  background-color: #777;
-  padding: 10px;
-  text-align: center;
-  color: white;
-}
-
-/* Responsive layout - makes the two columns/boxes stack on top of each other instead of next to each other, on small screens */
-@media (max-width: 600px) {
-  nav, article {
-    width: 100%;
-    height: auto;
-  }
-}
-</style>
+  <title>Portfolio</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <link href="https://fonts.googleapis.com/css?family=Muli:300,400,700,900" rel="stylesheet" />
+  <link rel="stylesheet" href="fonts/icomoon/style.css" />
+  <link rel="stylesheet" href="css/bootstrap.min.css" />
+  <link rel="stylesheet" href="css/jquery-ui.css" />
+  <link rel="stylesheet" href="css/owl.carousel.min.css" />
+  <link rel="stylesheet" href="css/owl.theme.default.min.css" />
+  <link rel="stylesheet" href="css/owl.theme.default.min.css" />
+  <link rel="stylesheet" href="css/jquery.fancybox.min.css" />
+  <link rel="stylesheet" href="css/bootstrap-datepicker.css" />
+  <link rel="stylesheet" href="fonts/flaticon/font/flaticon.css" />
+  <link rel="stylesheet" href="css/aos.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/uikit@3.5.5/dist/js/uikit.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/uikit@3.5.5/dist/js/uikit-icons.min.js"></script>
 </head>
-<body>
 
-<h2>CSS Layout Float</h2>
-<p>In this example, we have created a header, two columns/boxes and a footer. On smaller screens, the columns will stack on top of each other.</p>
-<p>Resize the browser window to see the responsive effect (you will learn more about this in our next chapter - HTML Responsive.)</p>
+<body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
+  <header class="site-navbar py-4 bg-white js-sticky-header site-navbar-target" role="banner">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-6 col-xl-2">
+          <h1 class="mb-0 site-logo">
+            <a href="index.html" class="text-black mb-0">Issak Gezehei<span class="text-primary">.</span>
+            </a>
+          </h1>
+        </div>
+        <div class="col-12 col-md-10 d-none d-xl-block">
+          <nav class="site-navigation position-relative text-right" role="navigation">
+            <ul class="site-menu main-menu js-clone-nav mr-auto d-none d-lg-block">
+              <li><a href="#home-section" class="nav-link">Home</a></li>
 
-<header>
-  <h2>Cities</h2>
-</header>
 
-<section>
-  <nav>
-    <ul>
-      <li><a href="#">London</a></li>
-      <li><a href="#">Paris</a></li>
-      <li><a href="#">Tokyo</a></li>
-    </ul>
-  </nav>
-  
-  <article>
-    <h1>London</h1>
-    <p>London is the capital city of England. It is the most populous city in the  United Kingdom, with a metropolitan area of over 13 million inhabitants.</p>
-    <p>Standing on the River Thames, London has been a major settlement for two millennia, its history going back to its founding by the Romans, who named it Londinium.</p>
-    <img src="747Shawn.jpg" alt="Me in a 747 engine">
-  </article>
-</section>
-
-<footer>
-  <p>Footer</p>
-</footer>
-
+              <li><a href="#contact-section" class="nav-link">Contact</a></li>
+            </ul>
+          </nav>
+        </div>
+        <div class="col-6 d-inline-block d-xl-none ml-md-0 py-3" style="position: relative; top: 3px">
+          <a href="#" class="site-menu-toggle js-menu-toggle text-black float-right"><span
+              class="icon-menu h3"></span></a>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="site-blocks-cover overlay" style="background-image: url(images/port-bg1.png)" data-aos="fade"
+    data-stellar-background-ratio="0.8">
+    <div class="container">
+      <div class="row align-items-center justify-content-center">
+        <div class="col-md-12" data-aos="fade-up" data-aos-delay="400">
+          <div class="row mb-4">
+            <div class="col-md-7">
+              <h1>Hi there.</h1>
+              <p class="mb-5 lead">
+                My name is Issak Gezehei. I am experienced Product Leader with
+                a strong background in B2B and B2C SaaS solutions for both
+                enterprise and SMB markets. I specialize in platform
+                integration and emerging technologies, with a proven track
+                record of leading cross-functional teams to deliver
+                customer-centric products that improve operational efficiency
+                and drive business growth. My product philosophy is rooted in
+                key principles: deep customer understanding, continuous value
+                delivery, outcome-focused execution, and empowered teams. I
+                embrace Marty Cagan's Product Operating Models, which foster
+                collaboration, enable rapid iteration, and support product-led
+                growth. Passionate about solving real-world problems with
+                technology, I strive to build products that are not only
+                functional but also deliver meaningful impact for both
+                customers and the business. As an early adopter of crypto
+                technologies and a champion of AI-driven automation, I
+                consistently integrate innovative thinking into product
+                strategies—modernizing legacy systems and enabling next-gen
+                capabilities for intelligent decision-making and engagement..
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="site-section bg-light" id="contact-section">
+    <div class="container">
+      <div class="row mb-5">
+        <div class="col-12 text-center">
+          <h3 class="section-sub-title">Contact Me</h3>
+          <h2 class="section-title mb-3">Get In Touch</h2>
+          <a href="" class="uk-icon-button uk-margin-small-right" uk-icon="mail">igezehei@gmail.com</a>
+                <a href="https://github.com/igezehei" class="uk-icon-button uk-margin-small-right"
+                  uk-icon="github">github</a>
+                <a href="https://www.linkedin.com/in/igezehei/"
+                  class="uk-icon-button uk-margin-small-right" uk-icon="linkedin">linkedin</a>
+        </div>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-md-7 mb-5">
+                
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- .site-wrap -->
+  <script src="js/jquery-3.3.1.min.js"></script>
+  <script src="js/jquery-migrate-3.0.1.min.js"></script>
+  <script src="js/jquery-ui.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/owl.carousel.min.js"></script>
+  <script src="js/jquery.stellar.min.js"></script>
+  <script src="js/jquery.countdown.min.js"></script>
+  <script src="js/bootstrap-datepicker.min.js"></script>
+  <script src="js/jquery.easing.1.3.js"></script>
+  <script src="js/aos.js"></script>
+  <script src="js/jquery.fancybox.min.js"></script>
+  <script src="js/jquery.sticky.js"></script>
+  <script src="js/main.js"></script>
 </body>
+
 </html>
