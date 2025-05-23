@@ -101,21 +101,24 @@
   </footer>
 
   <script>
-    document.getElementById('menuToggle').addEventListener('click', () => {
-      const menu = document.getElementById('mobileMenu');
-      menu.classList.toggle('hidden');
-    });
+  // Ensure the menu toggle works for mobile
+  document.getElementById('menuToggle').addEventListener('click', () => {
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('hidden');
+  });
 
-    document.getElementById('mobileDropdownToggle').addEventListener('click', () => {
-      const dropdown = document.getElementById('mobileDropdown');
-      dropdown.classList.toggle('hidden');
-    });
+  // Ensure the dropdown toggle works for mobile
+  document.getElementById('mobileDropdownToggle').addEventListener('click', () => {
+    const dropdown = document.getElementById('mobileDropdown');
+    dropdown.classList.toggle('hidden');
+  });
 
-    document.getElementById('desktopDropdownToggle').addEventListener('click', (event) => {
-      event.preventDefault(); // Prevent default link behavior
-      const dropdown = document.getElementById('desktopDropdown');
-      dropdown.classList.toggle('hidden');
-    });
-  </script>
+  // Ensure the dropdown toggle works for desktop
+  document.getElementById('desktopDropdownToggle').addEventListener('click', (event) => {
+    event.preventDefault(); // Prevent default link behavior
+    const dropdown = document.getElementById('desktopDropdown');
+    dropdown.classList.toggle('hidden');
+  });
+</script>
 </body>
 </html>
