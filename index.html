@@ -110,6 +110,12 @@
       const dropdown = document.getElementById('mobileDropdown');
       dropdown.classList.toggle('hidden');
     });
+
+    document.getElementById('desktopDropdownToggle').addEventListener('click', (event) => {
+      event.preventDefault(); // Prevent default link behavior
+      const dropdown = document.getElementById('desktopDropdown');
+      dropdown.classList.toggle('hidden');
+    });
   </script>
 </body>
 </html>
