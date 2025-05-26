@@ -433,7 +433,7 @@ h1, h2, h3, h4, h5,
     transform: translateX(0%); }
   .site-mobile-menu .site-mobile-menu-header {
     width: 100%;
-    float: left;
+    display: inline-block;
     padding-left: 20px;
     padding-right: 20px; }
     .site-mobile-menu .site-mobile-menu-header .site-mobile-menu-close {
@@ -1859,8 +1859,9 @@ h1, h2, h3, h4, h5,
 
 /* Disable hover behavior for the submenu */
 .group:hover #desktopDropdown {
-  display: none; /* Disable hover behavior for the submenu */
+  display: none; /* */
 }
+
 
 /* Add styles for click-to-toggle behavior */
 .group #desktopDropdown {
@@ -1887,4 +1888,51 @@ h1, h2, h3, h4, h5,
 .group #desktopDropdown.show {
   opacity: 1;
   visibility: visible;
+}
+
+#mobileDropdown {
+  display: none; /* Initially hidden */
+  position: absolute; /* Position it relative to the parent */
+  top: 100%; /* Place it below the toggle button */
+  left: 0;
+  width: 100%; /* Full width of the parent */
+  background-color: white; /* Background to separate visually */
+  z-index: 50; /* Ensure it appears above other elements */
+  padding: 0.5rem; /* Add padding for better spacing */
+  border: 1px solid #ccc; /* Optional: Add border for clarity */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for better visibility */
+}
+
+#mobileDropdown a {
+  display: block; /* Ensure each link occupies its own row */
+  width: 100%; /* Make each link span the full width */
+  padding: 0.75rem 1rem; /* Add padding for better spacing */
+  text-align: left; /* Align text to the left */
+  background-color: transparent; /* No background overlap */
+  border-bottom: 1px solid #e5e5e5; /* Add a separator for clarity */
+}
+
+#mobileDropdown {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  gap: 0.5rem; /* Add spacing between rows */
+}
+
+#mobileDropdown a {
+  display: block; /* Ensure each link occupies its own row */
+  padding: 0.75rem 1rem; /* Add padding for better spacing */
+  text-align: left; /* Align text to the left */
+  background-color: transparent; /* No background overlap */
+  border-radius: 4px; /* Optional: Add rounded corners */
+}
+
+#mobileDropdownToggle {
+  position: relative;
+  z-index: 51; /* Ensure toggle button is above dropdown */
+}
+
+/* Show the dropdown when the toggle is active */
+#mobileDropdownToggle.active + #mobileDropdown {
+  display: flex; /* Display the dropdown as a flex container */
+  flex-direction: column; /* Ensure items are stacked vertically */
 }

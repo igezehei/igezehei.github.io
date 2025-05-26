@@ -45,3 +45,36 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 });
+
+// Login functionality
+document.addEventListener('DOMContentLoaded', () => {
+  const loginForm = document.getElementById('modalLoginForm');
+  const errorMessage = document.getElementById('modalErrorMessage');
+
+  loginForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const username = document.getElementById('modalUsername').value.trim();
+    const password = document.getElementById('modalPassword').value.trim();
+
+    if (username === 'asmara' && password === 'product#2025') {
+      // Hide the modal and redirect to the target URL
+      document.getElementById('loginModal').classList.add('hidden');
+      const redirectUrl = sessionStorage.getItem('redirectUrl');
+      if (redirectUrl) {
+        sessionStorage.removeItem('redirectUrl');
+        window.location.href = redirectUrl;
+      } else {
+        alert('Login successful, but no redirect URL found.');
+      }
+    } else {
+      errorMessage.textContent = 'Invalid username or password.';
+      errorMessage.classList.remove('hidden');
+    }
+  });
+
+  // Close the login modal when the close button is clicked
+  document.getElementById('closeLoginModal').addEventListener('click', () => {
+    document.getElementById('loginModal').classList.add('hidden');
+  });
+});

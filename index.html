@@ -17,25 +17,25 @@
       <div class="relative group">
         <button id="desktopDropdownToggle" class="text-black font-medium hover:text-blue-600 transition-colors">Past Work</button>
         <div id="desktopDropdown" class="absolute left-0 mt-2 hidden flex-col bg-white shadow-md rounded-md py-2 w-56 z-50">
-          <a class="px-4 py-2 hover:bg-gray-100 block" href="https://igezehei.github.io/fintech-101/">Fintech</a>
-          <a class="px-4 py-2 hover:bg-gray-100 block" href="https://igezehei.github.io/supply-chain/">Supply Chain</a>
-          <a class="px-4 py-2 hover:bg-gray-100 block" href="https://igezehei.github.io/artificial-intelligence/">Artificial Intelligence</a>
-          <a class="px-4 py-2 hover:bg-gray-100 block" href="https://igezehei.github.io/quantum-computing/">Quantum Computing</a>
+          <a class="px-4 py-2 hover:bg-gray-100 block" href="#" onclick="redirectToLogin('https://igezehei.github.io/fintech-101/')">Fintech</a>
+          <a class="px-4 py-2 hover:bg-gray-100 block" href="#" onclick="redirectToLogin('https://igezehei.github.io/supply-chain/')">Supply Chain</a>
+          <a class="px-4 py-2 hover:bg-gray-100 block" href="#" onclick="redirectToLogin('https://igezehei.github.io/artificial-intelligence/')">Artificial Intelligence</a>
+          <a class="px-4 py-2 hover:bg-gray-100 block" href="#" onclick="redirectToLogin('https://igezehei.github.io/quantum-computing/')">Quantum Computing</a>
         </div>
       </div>
       <a href="#contact-section" class="text-black font-medium hover:text-blue-600 transition-colors">Contact</a>
     </div>
   </nav>
 
-  <div id="mobileMenu" class="md:hidden hidden flex-col absolute top-20 left-0 w-full bg-white shadow-md px-6 py-4 space-y-4 z-40">
+  <div id="mobileMenu" class="md:hidden hidden flex-col absolute top-20 left-0 w-full bg-white shadow-md px-6 py-4 z-40">
     <a href="#" class="text-black font-medium hover:text-blue-600">Home</a>
-    <div>
+    <div class="relative">
       <button id="mobileDropdownToggle" class="text-black font-medium hover:text-blue-600 w-full text-left">Past Work ▾</button>
-      <div id="mobileDropdown" class="hidden flex-col mt-2 space-y-2">
-        <a class="text-black font-medium hover:text-blue-600" href="https://igezehei.github.io/fintech-101/">Fintech</a>
-        <a class="text-black font-medium hover:text-blue-600" href="https://igezehei.github.io/supply-chain/">Supply Chain</a>
-        <a class="text-black font-medium hover:text-blue-600" href="https://igezehei.github.io/artificial-intelligence/">Artificial Intelligence</a>
-        <a class="text-black font-medium hover:text-blue-600" href="https://igezehei.github.io/quantum-computing/">Quantum Computing</a>
+      <div id="mobileDropdown" class="flex-col mt-2 space-y-2">
+        <a class="text-black font-medium hover:text-blue-600" href="#" onclick="redirectToLogin('https://igezehei.github.io/fintech-101/')">Fintech</a>
+        <a class="text-black font-medium hover:text-blue-600" href="#" onclick="redirectToLogin('https://igezehei.github.io/supply-chain/')">Supply Chain</a>
+        <a class="text-black font-medium hover:text-blue-600" href="#" onclick="redirectToLogin('https://igezehei.github.io/artificial-intelligence/')">Artificial Intelligence</a>
+        <a class="text-black font-medium hover:text-blue-600" href="#" onclick="redirectToLogin('https://igezehei.github.io/quantum-computing/')">Quantum Computing</a>
       </div>
     </div>
     <a href="#contact-section" class="text-black font-medium hover:text-blue-600">Contact</a>
@@ -100,6 +100,23 @@
     &copy; 2025 Issak Gezehei. All rights reserved.
   </footer>
 
+  <div id="loginModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-96">
+      <h2 class="text-xl font-bold mb-4">Login</h2>
+      <form id="modalLoginForm">
+        <label for="modalUsername" class="block text-sm font-medium text-gray-700">Username:</label>
+        <input type="text" id="modalUsername" class="w-full border border-gray-300 rounded-md p-2 mb-4" required>
+
+        <label for="modalPassword" class="block text-sm font-medium text-gray-700">Password:</label>
+        <input type="password" id="modalPassword" class="w-full border border-gray-300 rounded-md p-2 mb-4" required>
+
+        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">Login</button>
+      </form>
+      <p id="modalErrorMessage" class="text-red-500 text-sm mt-2 hidden">Invalid username or password.</p>
+      <button id="closeLoginModal" class="mt-4 text-blue-600 hover:underline">Close</button>
+    </div>
+  </div>
+
   <script>
   // Ensure the menu toggle works for mobile
   document.getElementById('menuToggle').addEventListener('click', () => {
@@ -118,6 +135,44 @@
     event.preventDefault(); // Prevent default link behavior
     const dropdown = document.getElementById('desktopDropdown');
     dropdown.classList.toggle('hidden');
+  });
+
+  function redirectToLogin(targetUrl) {
+    // Here you can implement the logic to check if the user is authenticated
+    const isAuthenticated = false; // Change this based on your authentication logic
+
+    if (!isAuthenticated) {
+      // If the user is not authenticated, show the login modal
+      document.getElementById('loginModal').classList.remove('hidden');
+    } else {
+      // If the user is authenticated, proceed to the target URL
+      window.location.href = targetUrl;
+    }
+  }
+
+  // Handle login form submission in the modal
+  document.getElementById('modalLoginForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    // Get the username and password from the modal inputs
+    const username = document.getElementById('modalUsername').value;
+    const password = document.getElementById('modalPassword').value;
+
+    // TODO: Implement your actual login logic here
+    // For demonstration, we'll just check if the username is "user" and password is "password"
+    if (username === 'user' && password === 'password') {
+      // If login is successful, hide the modal and redirect to the target URL
+      document.getElementById('loginModal').classList.add('hidden');
+      window.location.href = targetUrl; // Redirect to the original target URL
+    } else {
+      // If login fails, show an error message
+      document.getElementById('modalErrorMessage').classList.remove('hidden');
+    }
+  });
+
+  // Close the login modal when the close button is clicked
+  document.getElementById('closeLoginModal').addEventListener('click', () => {
+    document.getElementById('loginModal').classList.add('hidden');
   });
 </script>
 </body>
