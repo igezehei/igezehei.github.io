@@ -1,2 +1,30 @@
 # macOS system files
 .DS_Store
+
+# Node.js-related files
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build and temporary files
+dist/
+build/
+*.log
+*.tmp
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# SCSS cache files
+.sass-cache/
+
+# Other temporary files
+*.bak
+*.backup
+
+# Windows system files
+Thumbs.db
