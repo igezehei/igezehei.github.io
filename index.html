@@ -17,7 +17,7 @@
       <div class="relative group">
         <button id="desktopDropdownToggle" class="text-black font-medium hover:text-blue-600 transition-colors">Past Work</button>
         <div id="desktopDropdown" class="absolute left-0 mt-2 hidden flex-col bg-white shadow-md rounded-md py-2 w-56 z-50">
-          <a class="px-4 py-2 hover:bg-gray-100 block" href="#" onclick="redirectToLogin('https://igezehei.github.io/fintech-101/')">Fintech</a>
+          <a class="px-4 py-2 hover:bg-gray-100 block" href="https://igezehei.github.io/fintech-101/">Fintech</a>
           <a class="px-4 py-2 hover:bg-gray-100 block" href="#" onclick="redirectToLogin('https://igezehei.github.io/supply-chain/')">Supply Chain</a>
           <a class="px-4 py-2 hover:bg-gray-100 block" href="#" onclick="redirectToLogin('https://igezehei.github.io/artificial-intelligence/')">Artificial Intelligence</a>
           <a class="px-4 py-2 hover:bg-gray-100 block" href="#" onclick="redirectToLogin('https://igezehei.github.io/quantum-computing/')">Quantum Computing</a>
@@ -32,7 +32,7 @@
     <div class="relative">
       <button id="mobileDropdownToggle" class="text-black font-medium hover:text-blue-600 w-full text-left">Past Work ▾</button>
       <div id="mobileDropdown" class="flex-col mt-2 space-y-2">
-        <a class="text-black font-medium hover:text-blue-600" href="#" onclick="redirectToLogin('https://igezehei.github.io/fintech-101/')">Fintech</a>
+        <a class="text-black font-medium hover:text-blue-600" href="https://igezehei.github.io/fintech-101/">Fintech</a>
         <a class="text-black font-medium hover:text-blue-600" href="#" onclick="redirectToLogin('https://igezehei.github.io/supply-chain/')">Supply Chain</a>
         <a class="text-black font-medium hover:text-blue-600" href="#" onclick="redirectToLogin('https://igezehei.github.io/artificial-intelligence/')">Artificial Intelligence</a>
         <a class="text-black font-medium hover:text-blue-600" href="#" onclick="redirectToLogin('https://igezehei.github.io/quantum-computing/')">Quantum Computing</a>
@@ -138,16 +138,8 @@
   });
 
   function redirectToLogin(targetUrl) {
-    // Here you can implement the logic to check if the user is authenticated
-    const isAuthenticated = false; // Change this based on your authentication logic
-
-    if (!isAuthenticated) {
-      // If the user is not authenticated, show the login modal
-      document.getElementById('loginModal').classList.remove('hidden');
-    } else {
-      // If the user is authenticated, proceed to the target URL
-      window.location.href = targetUrl;
-    }
+    // Directly redirect to the target URL without authentication
+    window.location.href = targetUrl;
   }
 
   // Handle login form submission in the modal
@@ -158,11 +150,18 @@
     const username = document.getElementById('modalUsername').value;
     const password = document.getElementById('modalPassword').value;
 
-    // TODO: Implement your actual login logic here
-    // For demonstration, we'll just check if the username is "user" and password is "password"
+    // Debugging logs to trace the issue
+    console.log('Entered Username:', username);
+    console.log('Entered Password:', password);
+
+    // Define a target URL for redirection
+    const targetUrl = 'https://igezehei.github.io/fintech101'; // Update this URL for redirection
+
+    // Check login credentials
     if (username === 'user' && password === 'password') {
       // If login is successful, hide the modal and redirect to the target URL
       document.getElementById('loginModal').classList.add('hidden');
+      document.getElementById('modalErrorMessage').classList.add('hidden'); // Ensure error message is hidden
       window.location.href = targetUrl; // Redirect to the original target URL
     } else {
       // If login fails, show an error message
