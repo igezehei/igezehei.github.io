@@ -138,36 +138,25 @@
   });
 
   function redirectToLogin(targetUrl) {
-    // Directly redirect to the target URL without authentication
-    window.location.href = targetUrl;
+    // Show the login modal before redirecting
+    const loginModal = document.getElementById('loginModal');
+    loginModal.classList.remove('hidden');
+
+    // Handle login form submission
+    document.getElementById('modalLoginForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const username = document.getElementById('modalUsername').value;
+      const password = document.getElementById('modalPassword').value;
+
+      if (username === 'user' && password === 'password') {
+        loginModal.classList.add('hidden');
+        window.location.href = targetUrl;
+      } else {
+        document.getElementById('modalErrorMessage').classList.remove('hidden');
+      }
+    });
   }
-
-  // Handle login form submission in the modal
-  document.getElementById('modalLoginForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent the default form submission
-
-    // Get the username and password from the modal inputs
-    const username = document.getElementById('modalUsername').value;
-    const password = document.getElementById('modalPassword').value;
-
-    // Debugging logs to trace the issue
-    console.log('Entered Username:', username);
-    console.log('Entered Password:', password);
-
-    // Define a target URL for redirection
-    const targetUrl = 'https://igezehei.github.io/fintech101'; // Update this URL for redirection
-
-    // Check login credentials
-    if (username === 'user' && password === 'password') {
-      // If login is successful, hide the modal and redirect to the target URL
-      document.getElementById('loginModal').classList.add('hidden');
-      document.getElementById('modalErrorMessage').classList.add('hidden'); // Ensure error message is hidden
-      window.location.href = targetUrl; // Redirect to the original target URL
-    } else {
-      // If login fails, show an error message
-      document.getElementById('modalErrorMessage').classList.remove('hidden');
-    }
-  });
 
   // Close the login modal when the close button is clicked
   document.getElementById('closeLoginModal').addEventListener('click', () => {
