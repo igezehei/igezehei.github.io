@@ -138,9 +138,16 @@
   });
 
   function redirectToLogin(targetUrl) {
+    console.log('Redirect to login triggered for URL:', targetUrl); // Debugging log
+
     // Show the login modal before redirecting
     const loginModal = document.getElementById('loginModal');
-    loginModal.classList.remove('hidden');
+    if (loginModal) {
+      console.log('Login modal found, removing hidden class'); // Debugging log
+      loginModal.classList.remove('hidden');
+    } else {
+      console.error('Login modal not found'); // Debugging log
+    }
 
     // Handle login form submission
     document.getElementById('modalLoginForm').addEventListener('submit', function(event) {
@@ -149,10 +156,15 @@
       const username = document.getElementById('modalUsername').value;
       const password = document.getElementById('modalPassword').value;
 
+      console.log('Entered Username:', username); // Debugging log
+      console.log('Entered Password:', password); // Debugging log
+
       if (username === 'user' && password === 'password') {
+        console.log('Login successful, redirecting to:', targetUrl); // Debugging log
         loginModal.classList.add('hidden');
         window.location.href = targetUrl;
       } else {
+        console.log('Login failed, showing error message'); // Debugging log
         document.getElementById('modalErrorMessage').classList.remove('hidden');
       }
     });
