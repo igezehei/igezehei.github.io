@@ -88,11 +88,7 @@
           LinkedIn
         </a>
       </div>
-      <div class="contact-icons">
-        <a href="mailto:igezehei@gmail.com" class="uk-icon-button" uk-icon="mail"></a>
-        <a href="https://github.com/igezehei" class="uk-icon-button" uk-icon="github"></a>
-        <a href="https://www.linkedin.com/in/igezehei/" class="uk-icon-button" uk-icon="linkedin"></a>
-      </div>
+      <!-- Removed unused UIkit contact icons -->
     </div>
   </section>
 
@@ -137,38 +133,30 @@
     dropdown.classList.toggle('hidden');
   });
 
+  // Store the target URL for login redirect
+  let loginTargetUrl = null;
+
   function redirectToLogin(targetUrl) {
-    console.log('Redirect to login triggered for URL:', targetUrl); // Debugging log
-
-    // Show the login modal before redirecting
-    const loginModal = document.getElementById('loginModal');
-    if (loginModal) {
-      console.log('Login modal found, removing hidden class'); // Debugging log
-      loginModal.classList.remove('hidden');
-    } else {
-      console.error('Login modal not found'); // Debugging log
-    }
-
-    // Handle login form submission
-    document.getElementById('modalLoginForm').addEventListener('submit', function(event) {
-      event.preventDefault();
-
-      const username = document.getElementById('modalUsername').value;
-      const password = document.getElementById('modalPassword').value;
-
-      console.log('Entered Username:', username); // Debugging log
-      console.log('Entered Password:', password); // Debugging log
-
-      if (username === 'user' && password === 'password') {
-        console.log('Login successful, redirecting to:', targetUrl); // Debugging log
-        loginModal.classList.add('hidden');
-        window.location.href = targetUrl;
-      } else {
-        console.log('Login failed, showing error message'); // Debugging log
-        document.getElementById('modalErrorMessage').classList.remove('hidden');
-      }
-    });
+    loginTargetUrl = targetUrl;
+    document.getElementById('modalErrorMessage').classList.add('hidden');
+    document.getElementById('loginModal').classList.remove('hidden');
   }
+
+  // Handle login form submission (only add listener once)
+  document.getElementById('modalLoginForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const username = document.getElementById('modalUsername').value;
+    const password = document.getElementById('modalPassword').value;
+
+    if (username === 'user' && password === 'password') {
+      document.getElementById('loginModal').classList.add('hidden');
+      if (loginTargetUrl) {
+        window.location.href = loginTargetUrl;
+      }
+    } else {
+      document.getElementById('modalErrorMessage').classList.remove('hidden');
+    }
+  });
 
   // Close the login modal when the close button is clicked
   document.getElementById('closeLoginModal').addEventListener('click', () => {
