@@ -93,27 +93,31 @@
   </section>
 
   <footer class="bg-white text-center text-gray-500 py-6 border-t">
-    &copy; 2025 Issak Gezehei. All rights reserved.
+    <span id="copyrightYear"></span> Issak Gezehei. All rights reserved.
+    <div id="userInfo" class="mt-2 text-sm text-gray-700"></div>
   </footer>
 
   <div id="loginModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 w-96">
       <h2 class="text-xl font-bold mb-4">Login</h2>
-      <form id="modalLoginForm">
-        <label for="modalUsername" class="block text-sm font-medium text-gray-700">Username:</label>
-        <input type="text" id="modalUsername" class="w-full border border-gray-300 rounded-md p-2 mb-4" required>
-
-        <label for="modalPassword" class="block text-sm font-medium text-gray-700">Password:</label>
-        <input type="password" id="modalPassword" class="w-full border border-gray-300 rounded-md p-2 mb-4" required>
-
-        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">Login</button>
-      </form>
-      <p id="modalErrorMessage" class="text-red-500 text-sm mt-2 hidden">Invalid username or password.</p>
-      <button id="closeLoginModal" class="mt-4 text-blue-600 hover:underline">Close</button>
+      <div class="space-y-4">
+        <button id="loginGoogle" class="w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600 flex items-center justify-center gap-2">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" class="h-5 w-5"> Login with Google
+        </button>
+        <button id="loginGithub" class="w-full bg-gray-800 text-white py-2 rounded-md hover:bg-gray-900 flex items-center justify-center gap-2">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub" class="h-5 w-5"> Login with GitHub
+        </button>
+        <button id="loginLinkedin" class="w-full bg-blue-700 text-white py-2 rounded-md hover:bg-blue-800 flex items-center justify-center gap-2">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg" alt="LinkedIn" class="h-5 w-5"> Login with LinkedIn
+        </button>
+      </div>
+      <button id="closeLoginModal" class="mt-6 text-blue-600 hover:underline">Close</button>
     </div>
   </div>
 
   <script>
+  // Set dynamic copyright year
+  document.getElementById('copyrightYear').innerHTML = `&copy; ${new Date().getFullYear()}`;
   // Ensure the menu toggle works for mobile
   document.getElementById('menuToggle').addEventListener('click', () => {
     const menu = document.getElementById('mobileMenu');
@@ -138,30 +142,109 @@
 
   function redirectToLogin(targetUrl) {
     loginTargetUrl = targetUrl;
-    document.getElementById('modalErrorMessage').classList.add('hidden');
     document.getElementById('loginModal').classList.remove('hidden');
   }
-
-  // Handle login form submission (only add listener once)
-  document.getElementById('modalLoginForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const username = document.getElementById('modalUsername').value;
-    const password = document.getElementById('modalPassword').value;
-
-    if (username === 'user' && password === 'password') {
-      document.getElementById('loginModal').classList.add('hidden');
-      if (loginTargetUrl) {
-        window.location.href = loginTargetUrl;
-      }
-    } else {
-      document.getElementById('modalErrorMessage').classList.remove('hidden');
-    }
-  });
 
   // Close the login modal when the close button is clicked
   document.getElementById('closeLoginModal').addEventListener('click', () => {
     document.getElementById('loginModal').classList.add('hidden');
   });
+
+  // Auth0 configuration
+  const auth0Domain = 'YOUR_AUTH0_DOMAIN'; // e.g. dev-xxxxxx.us.auth0.com
+  const auth0ClientId = 'YOUR_AUTH0_CLIENT_ID';
+
+  // Load Auth0 JS SDK
+  (function() {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.auth0.com/js/auth0-spa-js/1.22/auth0-spa-js.production.js';
+    script.onload = initAuth0;
+    document.head.appendChild(script);
+  })();
+
+  let auth0 = null;
+  function initAuth0() {
+    window.createAuth0Client({
+      domain: auth0Domain,
+      client_id: auth0ClientId,
+      redirect_uri: window.location.origin
+    }).then(function(client) {
+      auth0 = client;
+      document.getElementById('loginGoogle').addEventListener('click', () => {
+        auth0.loginWithRedirect({ connection: 'google-oauth2' });
+      });
+      document.getElementById('loginGithub').addEventListener('click', () => {
+        auth0.loginWithRedirect({ connection: 'github' });
+      });
+      document.getElementById('loginLinkedin').addEventListener('click', () => {
+        auth0.loginWithRedirect({ connection: 'linkedin' });
+      });
+      // Check if returning from Auth0 redirect
+      auth0.isAuthenticated().then(function(isAuth) {
+        if (isAuth) {
+          auth0.getUser().then(function(user) {
+            if (user) {
+              // Display user info
+              document.getElementById('userInfo').innerHTML =
+                'Logged in as <b>' + (user.name || user.email) + '</b>' +
+                (user.email ? ' (' + user.email + ')' : '') +
+                '<button id="logoutBtn" class="ml-2 text-blue-600 underline">Logout</button>';
+              // Send user info to webhook
+              fetch('https://your-webhook-url.example.com/log-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  name: user.name,
+                  email: user.email,
+                  sub: user.sub,
+                  provider: user.sub ? user.sub.split('|')[0] : null,
+                  timestamp: new Date().toISOString()
+                })
+              });
+              // Logout button
+              document.getElementById('logoutBtn').addEventListener('click', function() {
+                auth0.logout({ returnTo: window.location.origin });
+              });
+            }
+          });
+        } else {
+          document.getElementById('userInfo').innerHTML = '';
+        }
+      });
+      // Handle Auth0 redirect callback
+      if (window.location.search.includes('code=') && window.location.search.includes('state=')) {
+        auth0.handleRedirectCallback().then(function() {
+          window.history.replaceState({}, document.title, '/');
+          auth0.isAuthenticated().then(function(isAuth) {
+            if (isAuth) {
+              auth0.getUser().then(function(user) {
+                if (user) {
+                  document.getElementById('userInfo').innerHTML =
+                    'Logged in as <b>' + (user.name || user.email) + '</b>' +
+                    (user.email ? ' (' + user.email + ')' : '') +
+                    '<button id="logoutBtn" class="ml-2 text-blue-600 underline">Logout</button>';
+                  fetch('https://your-webhook-url.example.com/log-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      name: user.name,
+                      email: user.email,
+                      sub: user.sub,
+                      provider: user.sub ? user.sub.split('|')[0] : null,
+                      timestamp: new Date().toISOString()
+                    })
+                  });
+                  document.getElementById('logoutBtn').addEventListener('click', function() {
+                    auth0.logout({ returnTo: window.location.origin });
+                  });
+                }
+              });
+            }
+          });
+        });
+      }
+    });
+  }
 </script>
 </body>
 </html>
