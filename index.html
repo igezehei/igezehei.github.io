@@ -95,6 +95,7 @@
   <footer class="bg-white text-center text-gray-500 py-6 border-t">
     <span id="copyrightYear"></span> Issak Gezehei. All rights reserved.
     <div id="userInfo" class="mt-2 text-sm text-gray-700"></div>
+    <button id="openLLMModal" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Ask Notebook LLM</button>
   </footer>
 
   <div id="loginModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
@@ -115,7 +116,49 @@
     </div>
   </div>
 
+  <!-- Notebook LLM Modal -->
+  <div id="llmModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-96">
+      <h2 class="text-xl font-bold mb-4">Ask Notebook LLM</h2>
+      <textarea id="llmQuery" class="w-full border border-gray-300 rounded-md p-2 mb-4" rows="3" placeholder="Type your question..."></textarea>
+      <button id="submitLLMQuery" class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">Submit</button>
+      <div id="llmResponse" class="mt-4 text-gray-700"></div>
+      <button id="closeLLMModal" class="mt-4 text-blue-600 hover:underline">Close</button>
+    </div>
+  </div>
+  </div>
+
   <script>
+  // LLM Modal logic
+  document.getElementById('openLLMModal').addEventListener('click', () => {
+    document.getElementById('llmModal').classList.remove('hidden');
+    document.getElementById('llmResponse').innerHTML = '';
+    document.getElementById('llmQuery').value = '';
+  });
+  document.getElementById('closeLLMModal').addEventListener('click', () => {
+    document.getElementById('llmModal').classList.add('hidden');
+  });
+  document.getElementById('submitLLMQuery').addEventListener('click', () => {
+    const query = document.getElementById('llmQuery').value.trim();
+    if (!query) {
+      document.getElementById('llmResponse').innerHTML = '<span class="text-red-500">Please enter a question.</span>';
+      return;
+    }
+    document.getElementById('llmResponse').innerHTML = 'Querying...';
+    // Replace with your actual Notebook LLM API endpoint
+    fetch('https://your-notebook-llm-api.example.com/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: query })
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('llmResponse').innerHTML = data.answer ? data.answer : '<span class="text-red-500">No answer returned.</span>';
+    })
+    .catch(() => {
+      document.getElementById('llmResponse').innerHTML = '<span class="text-red-500">Error querying LLM API.</span>';
+    });
+  });
   // Set dynamic copyright year
   document.getElementById('copyrightYear').innerHTML = `&copy; ${new Date().getFullYear()}`;
   // Ensure the menu toggle works for mobile
