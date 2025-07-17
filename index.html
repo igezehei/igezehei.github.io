@@ -128,6 +128,47 @@
   </div>
 
   <script>
+  // Prominent LLM Chat logic
+  const chatHistory = document.getElementById('llmChatHistory');
+  const chatInput = document.getElementById('llmChatInput');
+  const chatSend = document.getElementById('llmChatSend');
+
+  function appendMessage(sender, text) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = sender === 'user'
+      ? 'text-right'
+      : 'text-left bg-blue-50 rounded px-3 py-2';
+    msgDiv.innerHTML = `<span class="font-semibold">${sender === 'user' ? 'You' : 'Issak LLM'}:</span> ${text}`;
+    chatHistory.appendChild(msgDiv);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+  }
+
+  chatSend.addEventListener('click', () => {
+    const query = chatInput.value.trim();
+    if (!query) return;
+    appendMessage('user', query);
+    chatInput.value = '';
+    appendMessage('llm', 'Thinking...');
+    // Replace with your actual Notebook LLM API endpoint
+    fetch('https://your-notebook-llm-api.example.com/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: query })
+    })
+    .then(res => res.json())
+    .then(data => {
+      chatHistory.lastChild.remove();
+      appendMessage('llm', data.answer ? data.answer : 'No answer returned.');
+    })
+    .catch(() => {
+      chatHistory.lastChild.remove();
+      appendMessage('llm', 'Error querying LLM API.');
+    });
+  });
+
+  chatInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') chatSend.click();
+  });
   // LLM Modal logic
   document.getElementById('openLLMModal').addEventListener('click', () => {
     document.getElementById('llmModal').classList.remove('hidden');
