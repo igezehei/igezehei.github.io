@@ -42,49 +42,61 @@
   </div>
 
   <section class="bg-white py-20 text-center px-6">
-    <h1 class="text-4xl md:text-5xl font-bold mb-4">Issak Gezehei</h1>
-    <p class="text-lg md:text-xl text-gray-600">Product Leader | SaaS Innovator | AI Strategist</p>
-    <p class="max-w-2xl mx-auto mt-6 text-gray-700 ">
-      I build scalable platforms that transform how businesses operate — blending AI, integration, and customer-first product thinking.
-    </p>
-    <!-- AI Trends & Evaluation Section -->
-    <section class="bg-white py-12 px-6">
-      <div class="max-w-3xl mx-auto">
-        <h2 class="text-2xl font-bold mb-4 text-blue-700">AI Trends & Evaluation</h2>
-        <p class="text-gray-700 mb-4">
-          Artificial Intelligence is rapidly transforming industries. Key trends include Generative AI, Large Language Models (LLMs), Responsible AI, and AI-driven automation. Measuring and evaluating AI systems is crucial for ensuring reliability, fairness, and business impact.
+    <div class="max-w-6xl mx-auto py-20 px-6 flex flex-col md:flex-row gap-8 items-start">
+      <div class="flex-1 text-left">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">Issak Gezehei</h1>
+        <p class="text-lg md:text-xl text-gray-600">Product Leader | SaaS Innovator | AI Strategist</p>
+        <p class="max-w-2xl mt-6 text-gray-700">
+          I build scalable platforms that transform how businesses operate — blending AI, integration, and customer-first product thinking.
         </p>
-        <ul class="list-disc list-inside text-gray-700 mb-4">
-          <li><b>Generative AI:</b> Models that create text, images, code, and more.</li>
-          <li><b>LLM Evaluation:</b> Metrics like accuracy, relevance, bias, and user satisfaction.</li>
-          <li><b>Responsible AI:</b> Fairness, transparency, and ethical considerations.</li>
-          <li><b>AI for Product:</b> Using AI to drive growth, automate workflows, and personalize experiences.</li>
-        </ul>
-        <p class="text-gray-700 mb-2">
-          <b>How do you measure LLMs?</b> Common approaches include human evaluation, automated metrics (BLEU, ROUGE, etc.), and real-world user feedback.
-        </p>
-        <p class="text-gray-700 mb-2">
-          <b>Example questions to ask my Notebook LLM:</b>
-        </p>
-        <ul class="list-disc list-inside text-gray-700 mb-4">
-          <li>What are the latest trends in AI product development?</li>
-          <li>How do you evaluate the performance of a Large Language Model?</li>
-          <li>What metrics are used to measure AI fairness?</li>
-          <li>How can AI improve SaaS platforms?</li>
-          <li>What is Responsible AI and why does it matter?</li>
-        </ul>
+        <div class="bg-gray-100 rounded-lg p-6 shadow-md mt-8">
+          <h2 class="text-2xl font-semibold mb-4">Hi there!</h2>
+          <p class="leading-relaxed text-gray-700 mb-4 text-justify">
+            I am an experienced Product Leader with a strong background in B2B and B2C SaaS solutions for both enterprise and SMB markets. I specialize in platform integration and emerging technologies, with a proven track record of leading cross-functional teams to deliver customer-centric products that improve operational efficiency and drive business growth.
+          </p>
+          <p class="leading-relaxed text-gray-700 mb-4 text-justify">
+            My product philosophy is rooted in key principles: deep customer understanding, continuous value delivery, outcome-focused execution, and empowered teams. I embrace Marty Cagan's Product Operating Models, which foster collaboration, enable rapid iteration, and support product-led growth.
+          </p>
+          <p class="leading-relaxed text-gray-700 text-justify">
+            As an early adopter of crypto technologies and a champion of AI-driven automation, I consistently integrate innovative thinking into product strategies—modernizing legacy systems and enabling next-gen capabilities for intelligent decision-making and engagement.
+          </p>
+        </div>
       </div>
-    </section>
-    <div class="max-w-xl mx-auto bg-gray-100 rounded-lg p-6 shadow-md mt-8">
-      <h2 class="text-xl font-bold mb-2 text-center">Chat with Issak's Notebook LLM</h2>
-      <p class="mb-4 text-gray-700 text-center">Ask me about my experience, projects, product philosophy, or the latest in AI trends and evaluation!</p>
-      <div id="llmChatHistory" class="mb-4 space-y-2"></div>
-      <div class="flex gap-2">
-        <input id="llmChatInput" type="text" class="flex-1 border border-gray-300 rounded-md p-2" placeholder="Type your question..." />
-        <button id="llmChatSend" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Send</button>
+      <div class="w-full md:w-2/5 lg:w-1/3">
+        <div class="bg-gray-100 rounded-lg p-6 shadow-md">
+          <h2 class="text-xl font-bold mb-2 text-center">Chat with Issak's Notebook LLM</h2>
+          <p class="mb-4 text-gray-700 text-center">Ask me about my experience, projects, product philosophy, or the latest in AI trends and evaluation!
+            <span class="ml-2 relative group">
+              <button class="text-blue-600 underline text-sm" id="aiTrendsTipBtn" type="button">AI Trends & Evaluation Info</button>
+              <div id="aiTrendsTooltip" class="hidden absolute left-1/2 transform -translate-x-1/2 mt-2 w-96 bg-white border border-gray-300 rounded shadow-lg p-4 text-left z-50 text-sm">
+                <b>AI Trends & Evaluation</b><br>
+                Artificial Intelligence is rapidly transforming industries. Key trends include Generative AI, Large Language Models (LLMs), Responsible AI, and AI-driven automation. Measuring and evaluating AI systems is crucial for ensuring reliability, fairness, and business impact.<br><br>
+                <ul class="list-disc list-inside mb-2">
+                  <li><b>Generative AI:</b> Models that create text, images, code, and more.</li>
+                  <li><b>LLM Evaluation:</b> Metrics like accuracy, relevance, bias, and user satisfaction.</li>
+                  <li><b>Responsible AI:</b> Fairness, transparency, and ethical considerations.</li>
+                  <li><b>AI for Product:</b> Using AI to drive growth, automate workflows, and personalize experiences.</li>
+                </ul>
+                <b>How do you measure LLMs?</b> Common approaches include human evaluation, automated metrics (BLEU, ROUGE, etc.), and real-world user feedback.<br><br>
+                <b>Example questions to ask my Notebook LLM:</b>
+                <ul class="list-disc list-inside">
+                  <li>What are the latest trends in AI product development?</li>
+                  <li>How do you evaluate the performance of a Large Language Model?</li>
+                  <li>What metrics are used to measure AI fairness?</li>
+                  <li>How can AI improve SaaS platforms?</li>
+                  <li>What is Responsible AI and why does it matter?</li>
+                </ul>
+              </div>
+            </span>
+          </p>
+          <div id="llmChatHistory" class="mb-4 space-y-2"></div>
+          <div class="flex gap-2">
+            <input id="llmChatInput" type="text" class="flex-1 border border-gray-300 rounded-md p-2" placeholder="Type your question..." />
+            <button id="llmChatSend" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Send</button>
+          </div>
+        </div>
       </div>
     </div>
-    </section>
 
     <section class="bg-gray-100 py-16 px-6">
     <div class="max-w-4xl mx-auto">
@@ -156,6 +168,21 @@
   </div>
 
   <script>
+  // Tooltip logic for AI Trends & Evaluation
+  const aiTrendsTipBtn = document.getElementById('aiTrendsTipBtn');
+  const aiTrendsTooltip = document.getElementById('aiTrendsTooltip');
+  aiTrendsTipBtn.addEventListener('mouseenter', () => {
+    aiTrendsTooltip.classList.remove('hidden');
+  });
+  aiTrendsTipBtn.addEventListener('mouseleave', () => {
+    aiTrendsTooltip.classList.add('hidden');
+  });
+  aiTrendsTipBtn.addEventListener('focus', () => {
+    aiTrendsTooltip.classList.remove('hidden');
+  });
+  aiTrendsTipBtn.addEventListener('blur', () => {
+    aiTrendsTooltip.classList.add('hidden');
+  });
   // Prominent LLM Chat logic
   const chatHistory = document.getElementById('llmChatHistory');
   const chatInput = document.getElementById('llmChatInput');
