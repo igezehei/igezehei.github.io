@@ -209,36 +209,51 @@
   chatInput.addEventListener('keydown', e => {
     if (e.key === 'Enter') chatSend.click();
   });
-  // LLM Modal logic
-  document.getElementById('openLLMModal').addEventListener('click', () => {
-    document.getElementById('llmModal').classList.remove('hidden');
-    document.getElementById('llmResponse').innerHTML = '';
-    document.getElementById('llmQuery').value = '';
-  });
-  document.getElementById('closeLLMModal').addEventListener('click', () => {
-    document.getElementById('llmModal').classList.add('hidden');
-  });
-  document.getElementById('submitLLMQuery').addEventListener('click', () => {
-    const query = document.getElementById('llmQuery').value.trim();
-    if (!query) {
-      document.getElementById('llmResponse').innerHTML = '<span class="text-red-500">Please enter a question.</span>';
-      return;
-    }
-    document.getElementById('llmResponse').innerHTML = 'Querying...';
-    // Replace with your actual Notebook LLM API endpoint
-    fetch('https://your-notebook-llm-api.example.com/query', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question: query })
-    })
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById('llmResponse').innerHTML = data.answer ? data.answer : '<span class="text-red-500">No answer returned.</span>';
-    })
-    .catch(() => {
-      document.getElementById('llmResponse').innerHTML = '<span class="text-red-500">Error querying LLM API.</span>';
+  // LLM Modal logic (guarded - modal elements may be absent)
+  const openLLMModalBtn = document.getElementById('openLLMModal');
+  const closeLLMModalBtn = document.getElementById('closeLLMModal');
+  const submitLLMQueryBtn = document.getElementById('submitLLMQuery');
+  const llmModalEl = document.getElementById('llmModal');
+  const llmResponseEl = document.getElementById('llmResponse');
+  const llmQueryEl = document.getElementById('llmQuery');
+
+  if (openLLMModalBtn && llmModalEl && llmResponseEl && llmQueryEl) {
+    openLLMModalBtn.addEventListener('click', () => {
+      llmModalEl.classList.remove('hidden');
+      llmResponseEl.innerHTML = '';
+      llmQueryEl.value = '';
     });
-  });
+  }
+
+  if (closeLLMModalBtn && llmModalEl) {
+    closeLLMModalBtn.addEventListener('click', () => {
+      llmModalEl.classList.add('hidden');
+    });
+  }
+
+  if (submitLLMQueryBtn && llmResponseEl && llmQueryEl) {
+    submitLLMQueryBtn.addEventListener('click', () => {
+      const query = llmQueryEl.value.trim();
+      if (!query) {
+        llmResponseEl.innerHTML = '<span class="text-red-500">Please enter a question.</span>';
+        return;
+      }
+      llmResponseEl.innerHTML = 'Querying...';
+      // Replace with your actual Notebook LLM API endpoint
+      fetch('https://your-notebook-llm-api.example.com/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: query })
+      })
+      .then(res => res.json())
+      .then(data => {
+        llmResponseEl.innerHTML = data.answer ? data.answer : '<span class="text-red-500">No answer returned.</span>';
+      })
+      .catch(() => {
+        llmResponseEl.innerHTML = '<span class="text-red-500">Error querying LLM API.</span>';
+      });
+    });
+  }
   // Set dynamic copyright year
   document.getElementById('copyrightYear').innerHTML = `&copy; ${new Date().getFullYear()}`;
   // Countdown to 2026
