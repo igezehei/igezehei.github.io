@@ -127,8 +127,9 @@
       <button id="llmChatSend" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Send</button>
     </div>
   </div>
-    <span id="copyrightYear"></span> Issak Gezehei. All rights reserved.
-    <div id="userInfo" class="mt-2 text-sm text-gray-700"></div>
+  <span id="copyrightYear"></span> Issak Gezehei. All rights reserved.
+  <div id="countdown2026" class="mt-1 text-sm text-blue-600"></div>
+  <div id="userInfo" class="mt-2 text-sm text-gray-700"></div>
   </footer>
 
   <div id="loginModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
@@ -240,6 +241,25 @@
   });
   // Set dynamic copyright year
   document.getElementById('copyrightYear').innerHTML = `&copy; ${new Date().getFullYear()}`;
+  // Countdown to 2026
+  const countdownEl = document.getElementById('countdown2026');
+  function updateCountdown() {
+    const target = new Date('2026-01-01T00:00:00');
+    const now = new Date();
+    const diff = target - now;
+    if (diff <= 0) {
+      countdownEl.textContent = '2026 is here!';
+      clearInterval(countdownTimer);
+      return;
+    }
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+    countdownEl.textContent = `Countdown to 2026: ${days}d ${String(hours).padStart(2,'0')}h ${String(minutes).padStart(2,'0')}m ${String(seconds).padStart(2,'0')}s`;
+  }
+  updateCountdown();
+  const countdownTimer = setInterval(updateCountdown, 1000);
   // Ensure the menu toggle works for mobile
   document.getElementById('menuToggle').addEventListener('click', () => {
     const menu = document.getElementById('mobileMenu');
