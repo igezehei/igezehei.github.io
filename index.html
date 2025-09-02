@@ -153,6 +153,16 @@
   <!-- Notebook LLM Modal -->
 
   <script>
+  // Simple runtime logger to capture errors and help debug dropdown issues
+  (function setupLogger() {
+    console.log('[logger] script start - viewport width=', window.innerWidth);
+    window.addEventListener('error', (e) => {
+      console.error('[logger][error]', e.message, 'at', e.filename + ':' + e.lineno + ':' + e.colno, e.error);
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+      console.error('[logger][unhandledrejection]', e.reason);
+    });
+  })();
   // Tooltip logic for AI Trends & Evaluation
   const aiTrendsTipBtn = document.getElementById('aiTrendsTipBtn');
   const aiTrendsTooltip = document.getElementById('aiTrendsTooltip');
@@ -282,17 +292,31 @@
   });
 
   // Ensure the dropdown toggle works for mobile
-  document.getElementById('mobileDropdownToggle').addEventListener('click', () => {
-    const dropdown = document.getElementById('mobileDropdown');
-    dropdown.classList.toggle('hidden');
-  });
+  const mobileDropdownToggle = document.getElementById('mobileDropdownToggle');
+  const mobileDropdown = document.getElementById('mobileDropdown');
+  if (mobileDropdownToggle && mobileDropdown) {
+    mobileDropdownToggle.addEventListener('click', () => {
+      console.log('[logger] mobileDropdownToggle clicked');
+      mobileDropdown.classList.toggle('hidden');
+      console.log('[logger] mobileDropdown hidden=', mobileDropdown.classList.contains('hidden'));
+    });
+  } else {
+    console.warn('[logger] mobile dropdown elements missing', !!mobileDropdownToggle, !!mobileDropdown);
+  }
 
   // Ensure the dropdown toggle works for desktop
-  document.getElementById('desktopDropdownToggle').addEventListener('click', (event) => {
-    event.preventDefault(); // Prevent default link behavior
-    const dropdown = document.getElementById('desktopDropdown');
-    dropdown.classList.toggle('hidden');
-  });
+  const desktopDropdownToggle = document.getElementById('desktopDropdownToggle');
+  const desktopDropdown = document.getElementById('desktopDropdown');
+  if (desktopDropdownToggle && desktopDropdown) {
+    desktopDropdownToggle.addEventListener('click', (event) => {
+      event.preventDefault(); // Prevent default link behavior
+      console.log('[logger] desktopDropdownToggle clicked');
+      desktopDropdown.classList.toggle('hidden');
+      console.log('[logger] desktopDropdown hidden=', desktopDropdown.classList.contains('hidden'));
+    });
+  } else {
+    console.warn('[logger] desktop dropdown elements missing', !!desktopDropdownToggle, !!desktopDropdown);
+  }
 
   // Store the target URL for login redirect
   let loginTargetUrl = null;
