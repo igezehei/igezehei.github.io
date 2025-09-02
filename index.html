@@ -335,6 +335,41 @@
   const auth0Domain = 'YOUR_AUTH0_DOMAIN'; // e.g. dev-xxxxxx.us.auth0.com
   const auth0ClientId = 'YOUR_AUTH0_CLIENT_ID';
 
+  // Helpful warnings when placeholders are left in place
+  const userInfoEl = document.getElementById('userInfo');
+  if (auth0Domain.includes('YOUR_') || auth0ClientId.includes('YOUR_')) {
+    console.warn('[auth] Auth0 domain or client ID not configured. Login will not redirect.');
+    if (userInfoEl) userInfoEl.innerHTML = '<span class="text-red-600">Auth0 not configured — login disabled (set auth0Domain & auth0ClientId)</span>';
+  }
+
+  // Fallback/safe login helper so clicks surface a clear message if Auth0 isn't ready
+  function safeLoginWithConnection(connection) {
+    if (window.auth0) {
+      try {
+        window.auth0.loginWithRedirect({ connection });
+      } catch (err) {
+        console.error('[auth] loginWithRedirect failed', err);
+        if (userInfoEl) userInfoEl.innerHTML = '<span class="text-red-600">Login failed — see console for details.</span>';
+      }
+      return;
+    }
+    console.warn('[auth] login attempted but auth0 client not initialized');
+    if (userInfoEl) userInfoEl.innerHTML = '<span class="text-red-600">Auth not ready. Try again after page loads or check console.</span>';
+  }
+
+  // Attach resilient click handlers to login buttons (they will defer to initAuth0's handlers if available)
+  ['loginGoogle','loginGithub','loginLinkedin'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('click', (e) => {
+      // If initAuth0 attached handlers, they may run too; this gives fallback messaging
+      if (id === 'loginGoogle') safeLoginWithConnection('google-oauth2');
+      if (id === 'loginGithub') safeLoginWithConnection('github');
+      if (id === 'loginLinkedin') safeLoginWithConnection('linkedin');
+      e.preventDefault();
+    });
+  });
+
   // Load Auth0 JS SDK
   (function() {
     const script = document.createElement('script');
