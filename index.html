@@ -331,16 +331,54 @@
     document.getElementById('loginModal').classList.add('hidden');
   });
 
-  // Auth0 configuration
-  const auth0Domain = 'YOUR_AUTH0_DOMAIN'; // e.g. dev-xxxxxx.us.auth0.com
-  const auth0ClientId = 'YOUR_AUTH0_CLIENT_ID';
+  // Auth0 configuration (placeholders are defined later and may be overridden by /auth-config.json)
 
   // Helpful warnings when placeholders are left in place
   const userInfoEl = document.getElementById('userInfo');
-  if (auth0Domain.includes('YOUR_') || auth0ClientId.includes('YOUR_')) {
-    console.warn('[auth] Auth0 domain or client ID not configured. Login will not redirect.');
-    if (userInfoEl) userInfoEl.innerHTML = '<span class="text-red-600">Auth0 not configured — login disabled (set auth0Domain & auth0ClientId)</span>';
-  }
+    // Auth0 configuration (can be overridden by a local /auth-config.json file)
+    let auth0Domain = 'YOUR_AUTH0_DOMAIN'; // e.g. dev-xxxxxx.us.auth0.com
+    let auth0ClientId = 'YOUR_AUTH0_CLIENT_ID';
+
+    // Two-phase init: wait for optional config file and SDK load before calling initAuth0
+    let sdkLoaded = false;
+    let configLoaded = false;
+
+    function maybeInitAuth0() {
+      if (!sdkLoaded || !configLoaded) return;
+      try {
+        initAuth0();
+      } catch (err) {
+        console.error('[auth] initAuth0 failed', err);
+      }
+    }
+
+    // Try to load /auth-config.json (create this locally with your real domain/client id)
+    fetch('/auth-config.json').then(res => {
+      if (!res.ok) throw new Error('no config');
+      return res.json();
+    }).then(cfg => {
+      if (cfg.auth0Domain) auth0Domain = cfg.auth0Domain;
+      if (cfg.auth0ClientId) auth0ClientId = cfg.auth0ClientId;
+      console.log('[auth] loaded auth-config.json', { auth0Domain, auth0ClientId: !!auth0ClientId });
+    }).catch(() => {
+      console.warn('[auth] no /auth-config.json found — using inline placeholders');
+    }).finally(() => {
+      configLoaded = true;
+      maybeInitAuth0();
+    });
+
+    // Load Auth0 JS SDK
+    (function() {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.auth0.com/js/auth0-spa-js/1.22/auth0-spa-js.production.js';
+      script.onload = () => {
+        sdkLoaded = true;
+        console.log('[auth] auth0 SDK loaded');
+        maybeInitAuth0();
+      };
+      script.onerror = (e) => console.error('[auth] failed to load SDK', e);
+      document.head.appendChild(script);
+    })();
 
   // Fallback/safe login helper so clicks surface a clear message if Auth0 isn't ready
   function safeLoginWithConnection(connection) {

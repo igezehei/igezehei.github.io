@@ -1,0 +1,4 @@
+{
+  "auth0Domain": "dev-xxxxxx.us.auth0.com",
+  "auth0ClientId": "YOUR_AUTH0_CLIENT_ID"
+}
