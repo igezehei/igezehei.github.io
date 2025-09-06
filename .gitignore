@@ -28,3 +28,6 @@ build/
 
 # Windows system files
 Thumbs.db
+
+# Local Auth0 config (do not commit)
+auth-config.json
