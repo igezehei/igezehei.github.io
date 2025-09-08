@@ -127,7 +127,7 @@
       <button id="llmChatSend" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Send</button>
     </div>
   </div>
-  <span id="copyrightYear"></span> Issak Gezehei. All rights reserved.
+  <span id="copyrightYear"></span>
   <div id="countdown2026" class="mt-1 text-sm text-blue-600"></div>
   <div id="userInfo" class="mt-2 text-sm text-gray-700"></div>
   </footer>
@@ -264,8 +264,14 @@
       });
     });
   }
-  // Set fixed copyright year
-  document.getElementById('copyrightYear').innerHTML = '&copy; 2025';
+  // Set copyright text dynamically using the current year
+  (function setCopyright() {
+    const year = new Date().getFullYear();
+    const el = document.getElementById('copyrightYear');
+    if (el) {
+      el.innerHTML = `&copy; ${year} Issak Gezehei. All rights reserved.`;
+    }
+  })();
   // Countdown to 2026
   const countdownEl = document.getElementById('countdown2026');
   function updateCountdown() {
