@@ -163,21 +163,25 @@
       console.error('[logger][unhandledrejection]', e.reason);
     });
   })();
-  // Tooltip logic for AI Trends & Evaluation
+  // Tooltip logic for AI Trends & Evaluation (guarded)
   const aiTrendsTipBtn = document.getElementById('aiTrendsTipBtn');
   const aiTrendsTooltip = document.getElementById('aiTrendsTooltip');
-  aiTrendsTipBtn.addEventListener('mouseenter', () => {
-    aiTrendsTooltip.classList.remove('hidden');
-  });
-  aiTrendsTipBtn.addEventListener('mouseleave', () => {
-    aiTrendsTooltip.classList.add('hidden');
-  });
-  aiTrendsTipBtn.addEventListener('focus', () => {
-    aiTrendsTooltip.classList.remove('hidden');
-  });
-  aiTrendsTipBtn.addEventListener('blur', () => {
-    aiTrendsTooltip.classList.add('hidden');
-  });
+  if (aiTrendsTipBtn && aiTrendsTooltip) {
+    aiTrendsTipBtn.addEventListener('mouseenter', () => {
+      aiTrendsTooltip.classList.remove('hidden');
+    });
+    aiTrendsTipBtn.addEventListener('mouseleave', () => {
+      aiTrendsTooltip.classList.add('hidden');
+    });
+    aiTrendsTipBtn.addEventListener('focus', () => {
+      aiTrendsTooltip.classList.remove('hidden');
+    });
+    aiTrendsTipBtn.addEventListener('blur', () => {
+      aiTrendsTooltip.classList.add('hidden');
+    });
+  } else {
+    console.warn('[ui] AI Trends tooltip elements not found', !!aiTrendsTipBtn, !!aiTrendsTooltip);
+  }
   // Prominent LLM Chat logic
   const chatHistory = document.getElementById('llmChatHistory');
   const chatInput = document.getElementById('llmChatInput');
@@ -193,12 +197,16 @@
     chatHistory.scrollTop = chatHistory.scrollHeight;
   }
 
+  // LLM query with simple request guard (disable inputs while pending)
   chatSend.addEventListener('click', () => {
     const query = chatInput.value.trim();
     if (!query) return;
     appendMessage('user', query);
     chatInput.value = '';
     appendMessage('llm', 'Thinking...');
+    // disable while waiting
+    chatSend.disabled = true;
+    chatInput.disabled = true;
     // Replace with your actual Notebook LLM API endpoint
     fetch('https://your-notebook-llm-api.example.com/query', {
       method: 'POST',
@@ -208,11 +216,16 @@
     .then(res => res.json())
     .then(data => {
       chatHistory.lastChild.remove();
-      appendMessage('llm', data.answer ? data.answer : 'No answer returned.');
+      appendMessage('llm', data && data.answer ? data.answer : 'No answer returned.');
     })
     .catch(() => {
       chatHistory.lastChild.remove();
       appendMessage('llm', 'Error querying LLM API.');
+    })
+    .finally(() => {
+      chatSend.disabled = false;
+      chatInput.disabled = false;
+      chatInput.focus();
     });
   });
 
@@ -323,6 +336,38 @@
   } else {
     console.warn('[logger] desktop dropdown elements missing', !!desktopDropdownToggle, !!desktopDropdown);
   }
+
+  // Close desktop dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!desktopDropdown || !desktopDropdownToggle) return;
+    const target = e.target;
+    if (!desktopDropdown.contains(target) && !desktopDropdownToggle.contains(target)) {
+      if (!desktopDropdown.classList.contains('hidden')) {
+        desktopDropdown.classList.add('hidden');
+        console.log('[logger] closed desktop dropdown due to outside click');
+      }
+    }
+  });
+
+  // Global key handler: Escape closes modals/menus
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const loginModal = document.getElementById('loginModal');
+      if (loginModal && !loginModal.classList.contains('hidden')) {
+        loginModal.classList.add('hidden');
+      }
+      const mobileMenu = document.getElementById('mobileMenu');
+      if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+        mobileMenu.classList.add('hidden');
+      }
+      if (aiTrendsTooltip && !aiTrendsTooltip.classList.contains('hidden')) {
+        aiTrendsTooltip.classList.add('hidden');
+      }
+      if (desktopDropdown && !desktopDropdown.classList.contains('hidden')) {
+        desktopDropdown.classList.add('hidden');
+      }
+    }
+  });
 
   // Store the target URL for login redirect
   let loginTargetUrl = null;
