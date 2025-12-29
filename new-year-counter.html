@@ -1,7 +1,15 @@
 <!-- New Year Counter Component -->
-<div id="year-counter" class="year-counter-container">
-  <div class="year-counter-card">
-    <h2 class="year-counter-title">2025 Progress</h2>
+<div id="year-counter-modal" class="year-counter-modal">
+  <div class="year-counter-overlay"></div>
+  <div class="year-counter-container">
+    <button class="year-counter-close" id="close-year-counter" aria-label="Close">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    <div class="year-counter-card">
+      <h2 class="year-counter-title">2025 Progress</h2>
     
     <div class="year-stats">
       <div class="stat-item">
@@ -32,10 +40,90 @@
         <span class="milestone-event">Today</span>
       </div>
       <div class="milestone">
-        <span class="milestone-date">Dec 31</span>
-        <span class="milestone-event">Year Ends</span>
-      </div>
     </div>
+  </div>
+</div>
+
+<style>
+.year-counter-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;.modal-content
+  animation: fadeIn 0.3s ease;
+}
+
+.year-counter-modal.show {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.year-counter-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  cursor: pointer;
+}
+
+.year-counter-container {
+  position: relative;
+  z-index: 10;
+  animation: slideIn 0.4s ease;
+}
+
+.year-counter-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.2s ease;
+  z-index: 11;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.year-counter-close:hover {
+  color: #1f2937;
+  transform: rotate(90deg);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+}
+
+</   </div>
 
     <div class="year-info">
       <p id="year-message"></p>
@@ -185,12 +273,52 @@
 .year-info {
   text-align: center;
   padding: 1.5rem;
-  background-color: #f9fafb;
-  border-radius: 0.5rem;
-  margin-top: 1.5rem;
+function showYearCounterModal() {
+  const modal = document.getElementById('year-counter-modal');
+  if (modal) {
+    modal.classList.add('show');
+  }
 }
 
-.year-info p {
+function closeYearCounterModal() {
+  const modal = document.getElementById('year-counter-modal');
+  if (modal) {
+    modal.classList.remove('show');
+    // Store that user dismissed the modal in sessionStorage
+    sessionStorage.setItem('yearCounterDismissed', 'true');
+  }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  initYearCounter();
+  
+  // Check if user has already dismissed the modal this session
+  const isDismissed = sessionStorage.getItem('yearCounterDismissed');
+  if (!isDismissed) {
+    // Show modal after a brief delay for better UX
+    setTimeout(showYearCounterModal, 500);
+  }
+  
+  // Attach close button listener
+  const closeBtn = document.getElementById('close-year-counter');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeYearCounterModal);
+  }
+  
+  // Close modal when clicking on overlay
+  const overlay = document.querySelector('.year-counter-overlay');
+  if (overlay) {
+    overlay.addEventListener('click', closeYearCounterModal);
+  }
+  
+  // Close modal on Escape key
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      closeYearCounterModal();
+    }
+  });
+});year-info p {
   font-size: 0.875rem;
   color: #374151;
   margin: 0;
