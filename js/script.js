@@ -46,35 +46,76 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
-// Login functionality
-document.addEventListener('DOMContentLoaded', () => {
-  const loginForm = document.getElementById('modalLoginForm');
-  const errorMessage = document.getElementById('modalErrorMessage');
+// Auth0 Configuration and Login
+let auth0Client = null;
 
-  loginForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-
-    const username = document.getElementById('modalUsername').value.trim();
-    const password = document.getElementById('modalPassword').value.trim();
-
-    if (username === 'asmara' && password === 'product#2025') {
-      // Hide the modal and redirect to the target URL
-      document.getElementById('loginModal').classList.add('hidden');
-      const redirectUrl = sessionStorage.getItem('redirectUrl');
-      if (redirectUrl) {
-        sessionStorage.removeItem('redirectUrl');
-        window.location.href = redirectUrl;
-      } else {
-        alert('Login successful, but no redirect URL found.');
-      }
-    } else {
-      errorMessage.textContent = 'Invalid username or password.';
-      errorMessage.classList.remove('hidden');
+// Initialize Auth0 client
+async function initializeAuth0() {
+  try {
+    // Load configuration from auth-config.json
+    const response = await fetch('/auth-config.json');
+    if (!response.ok) {
+      console.error('auth-config.json not found. Please create this file with your Auth0 credentials.');
+      return;
     }
-  });
+    
+    const config = await response.json();
+    
+    // Initialize Auth0 client
+    auth0Client = await auth0.createAuth0Client({
+      domain: config.auth0Domain,
+      clientId: config.auth0ClientId,
+      authorizationParams: {
+        redirect_uri: window.location.origin
+      }
+    });
+    
+    // Check if user is already logged in
+    const isAuthenticated = await auth0Client.isAuthenticated();
+    if (isAuthenticated) {
+      const user = await auth0Client.getUser();
+      console.log('User is authenticated:', user);
+    }
+  } catch (error) {
+    console.error('Failed to initialize Auth0:', error);
+  }
+}
 
+// Redirect to Auth0 login
+async function login() {
+  try {
+    // Store the redirect URL if provided
+    const redirectUrl = sessionStorage.getItem('redirectUrl');
+    
+    await auth0Client.loginWithRedirect({
+      authorizationParams: {
+        redirect_uri: redirectUrl || window.location.origin
+      }
+    });
+  } catch (error) {
+    console.error('Login failed:', error);
+  }
+}
+
+// Handle login button click (if present in modal)
+document.addEventListener('DOMContentLoaded', async () => {
+  // Initialize Auth0 first
+  await initializeAuth0();
+  
+  // If modal login form exists, update it to use Auth0
+  const loginForm = document.getElementById('modalLoginForm');
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      await login();
+    });
+  }
+  
   // Close the login modal when the close button is clicked
-  document.getElementById('closeLoginModal').addEventListener('click', () => {
-    document.getElementById('loginModal').classList.add('hidden');
-  });
+  const closeButton = document.getElementById('closeLoginModal');
+  if (closeButton) {
+    closeButton.addEventListener('click', () => {
+      document.getElementById('loginModal').classList.add('hidden');
+    });
+  }
 });
