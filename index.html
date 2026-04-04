@@ -3,19 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Issak Gezehei - Product Leader</title>
+  <meta name="description" content="Issak Gezehei - Product Leader, SaaS Innovator, and AI Strategist. Building scalable platforms that transform how businesses operate through AI, integration, and customer-first product thinking." />
+  <meta name="keywords" content="Product Leader, SaaS, AI, Product Management, Software Engineering, AI Strategy, Claude, Gemini, OpenClaw" />
+  <meta name="author" content="Issak Gezehei" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://igezehei.github.io/" />
+  <meta property="og:title" content="Issak Gezehei - Product Leader & AI Strategist" />
+  <meta property="og:description" content="Building scalable platforms that transform how businesses operate through AI, integration, and customer-first product thinking." />
+  <meta property="og:image" content="https://igezehei.github.io/images/port-bg1.png" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://igezehei.github.io/" />
+  <meta property="twitter:title" content="Issak Gezehei - Product Leader & AI Strategist" />
+  <meta property="twitter:description" content="Building scalable platforms that transform how businesses operate through AI, integration, and customer-first product thinking." />
+  <meta property="twitter:image" content="https://igezehei.github.io/images/port-bg1.png" />
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://igezehei.github.io/" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+  <title>Issak Gezehei - Product Leader & AI Strategist</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="font-sans text-gray-800 bg-gray-50">
-  <nav class="fixed top-0 left-0 w-full bg-white shadow-md z-50 flex justify-between items-center px-6 py-4">
+  <nav class="fixed top-0 left-0 w-full bg-white shadow-md z-50 flex justify-between items-center px-6 py-4" role="navigation" aria-label="Main navigation">
     <div class="text-xl font-bold"></div>
     <div class="md:hidden">
-      <button id="menuToggle" class="text-2xl">☰</button>
+      <button id="menuToggle" class="text-2xl" aria-label="Toggle mobile menu" aria-expanded="false">☰</button>
     </div>
     <div id="navLinks" class="hidden md:flex items-center space-x-4">
       <a href="#" class="text-black font-medium hover:text-blue-600 transition-colors">Home</a>
       <div class="relative group">
-        <button id="desktopDropdownToggle" class="text-black font-medium hover:text-blue-600 transition-colors">Past Work</button>
+        <button id="desktopDropdownToggle" class="text-black font-medium hover:text-blue-600 transition-colors" aria-label="Past Work menu" aria-haspopup="true" aria-expanded="false">Past Work</button>
         <div id="desktopDropdown" class="absolute left-0 mt-2 hidden flex-col bg-white shadow-md rounded-md py-2 w-56 z-50">
           <a class="px-4 py-2 hover:bg-gray-100 block" href="#" onclick="redirectToLogin('https://igezehei.github.io/fintech-101/')">Fintech</a>
           <a class="px-4 py-2 hover:bg-gray-100 block" href="#" onclick="redirectToLogin('https://igezehei.github.io/supply-chain/')">Supply Chain</a>
@@ -205,9 +229,9 @@
   <div id="userInfo" class="mt-2 text-sm text-gray-700"></div>
   </footer>
 
-  <div id="loginModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+  <div id="loginModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
     <div class="bg-white rounded-lg shadow-lg p-6 w-96">
-      <h2 class="text-xl font-bold mb-4">Login</h2>
+      <h2 id="loginModalTitle" class="text-xl font-bold mb-4">Login</h2>
       <div class="space-y-4">
         <button id="loginGoogle" class="w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600 flex items-center justify-center gap-2">
           <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" class="h-5 w-5"> Login with Google
@@ -219,7 +243,7 @@
           <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg" alt="LinkedIn" class="h-5 w-5"> Login with LinkedIn
         </button>
       </div>
-      <button id="closeLoginModal" class="mt-6 text-blue-600 hover:underline">Close</button>
+      <button id="closeLoginModal" class="mt-6 text-blue-600 hover:underline" aria-label="Close login modal">Close</button>
     </div>
   </div>
 
