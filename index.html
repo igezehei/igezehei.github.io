@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Issak Gezehei - Product Leader, SaaS Innovator, and AI Strategist. Building scalable platforms that transform how businesses operate through AI, integration, and customer-first product thinking." />
-  <meta name="keywords" content="Product Leader, SaaS, AI, Product Management, Software Engineering, AI Strategy, Claude, Gemini, OpenClaw" />
+  <meta name="keywords" content="Product Leader, SaaS, AI, Product Management, Software Engineering, AI Strategy, Claude, Gemini, GPT-4" />
   <meta name="author" content="Issak Gezehei" />
 
   <!-- Open Graph / Facebook -->
@@ -55,7 +55,7 @@
     <a href="#" class="text-black font-medium hover:text-blue-600">Home</a>
     <div class="relative">
       <button id="mobileDropdownToggle" class="text-black font-medium hover:text-blue-600 w-full text-left">Past Work ▾</button>
-      <div id="mobileDropdown" class="flex-col mt-2 space-y-2">
+      <div id="mobileDropdown" class="hidden flex-col mt-2 space-y-2">
         <a class="text-black font-medium hover:text-blue-600" href="https://igezehei.github.io/fintech-101/">Fintech</a>
         <a class="text-black font-medium hover:text-blue-600" href="#" onclick="redirectToLogin('https://igezehei.github.io/supply-chain/')">Supply Chain</a>
         <a class="text-black font-medium hover:text-blue-600" href="#" onclick="redirectToLogin('https://igezehei.github.io/artificial-intelligence/')">Artificial Intelligence</a>
@@ -67,6 +67,7 @@
 
   <section class="bg-white py-20 text-center px-6">
     <div class="max-w-3xl mx-auto py-20 px-6 flex flex-col items-center justify-center text-center">
+      <div class="w-24 h-24 rounded-full bg-blue-600 flex items-center justify-center text-white text-3xl font-bold mb-6 shadow-lg" aria-hidden="true">IG</div>
       <h1 class="text-4xl md:text-5xl font-bold mb-4">Issak Gezehei</h1>
       <p class="text-lg md:text-xl text-gray-600 mb-2">Product Leader | SaaS Innovator | AI Strategist</p>
       <p class="max-w-2xl mx-auto mt-6 text-gray-700 text-center">
@@ -105,7 +106,7 @@
             AI Revolution
           </h3>
           <p class="leading-relaxed mb-4 text-gray-700">
-            Modern AI technologies like <strong>Claude</strong>, <strong>AI Studio</strong>, <strong>OpenClaw</strong> and other Google models (e.g. Gemini) are fundamentally changing how humans interact with intelligent systems. These tools enable seamless, context-aware conversations that understand nuance and complexity in ways that mirror human cognition.
+            Modern AI technologies like <strong>Claude</strong>, <strong>Gemini</strong>, and <strong>GPT-4</strong> are fundamentally changing how humans interact with intelligent systems. These tools enable seamless, context-aware conversations that understand nuance and complexity in ways that mirror human cognition.
           </p>
         </div>
 
@@ -168,7 +169,7 @@
       <h3 class="text-xl font-semibold text-gray-600">Contact Me</h3>
       <h2 class="text-3xl font-bold mb-6">Get In Touch</h2>
       <div class="flex justify-center gap-6 text-blue-600">
-        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=igezehei@gmail.com" target="_blank" class="hover:underline flex items-center">
+        <a href="mailto:igezehei@gmail.com" class="hover:underline flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-18 0a2 2 0 012-2h14a2 2 0 012 2m-18 0v8a2 2 0 002 2h14a2 2 0 002-2V8" />
           </svg>
@@ -192,7 +193,7 @@
   </section>
 
   <footer class="bg-white text-center text-gray-500 py-6 border-t">
-  <div class="max-w-xl mx-auto bg-gray-100 rounded-lg p-6 shadow-md mb-8">
+  <div id="llmChatContainer" class="hidden max-w-xl mx-auto bg-gray-100 rounded-lg p-6 shadow-md mb-8">
     <h2 class="text-xl font-bold mb-2 text-center">Chat with Issak's Notebook LLM</h2>
     <p class="mb-4 text-gray-700 text-center">Ask me about my experience, projects, product philosophy, or the latest in AI trends and evaluation!
       <span class="ml-2 relative group">
@@ -201,7 +202,7 @@
           <b>AI Trends & Evaluation</b><br>
           Artificial Intelligence is rapidly transforming industries. Key trends include Generative AI, Large Language Models (LLMs), Responsible AI, and AI-driven automation. Measuring and evaluating AI systems is crucial for ensuring reliability, fairness, and business impact.<br><br>
           <ul class="list-disc list-inside mb-2">
-            <li><b>Generative AI:</b> Models that create text, images, code, and more (including Google’s OpenClaw, Gemini, etc.).</li>
+            <li><b>Generative AI:</b> Models that create text, images, code, and more (including Claude, Gemini, GPT-4, and more).</li>
             <li><b>LLM Evaluation:</b> Metrics like accuracy, relevance, bias, and user satisfaction.</li>
             <li><b>Responsible AI:</b> Fairness, transparency, and ethical considerations.</li>
             <li><b>AI for Product:</b> Using AI to drive growth, automate workflows, and personalize experiences.</li>
@@ -246,9 +247,6 @@
       <button id="closeLoginModal" class="mt-6 text-blue-600 hover:underline" aria-label="Close login modal">Close</button>
     </div>
   </div>
-
-  <!-- Load Auth0 SDK -->
-  <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
 
   <!-- Load main JavaScript -->
   <script src="js/main.js"></script>

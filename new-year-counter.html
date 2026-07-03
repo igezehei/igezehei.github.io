@@ -9,37 +9,45 @@
       </svg>
     </button>
     <div class="year-counter-card">
-      <h2 class="year-counter-title">2025 Progress</h2>
-    
-    <div class="year-stats">
-      <div class="stat-item">
-        <div class="stat-number" id="days-passed">0</div>
-        <div class="stat-label">Days Passed</div>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <div class="stat-number" id="days-remaining">0</div>
-        <div class="stat-label">Days Remaining</div>
-      </div>
-    </div>
+      <h2 class="year-counter-title" id="year-counter-title">Year Progress</h2>
 
-    <div class="progress-bar-container">
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill"></div>
+      <div class="year-stats">
+        <div class="stat-item">
+          <div class="stat-number" id="days-passed">0</div>
+          <div class="stat-label">Days Passed</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-number" id="days-remaining">0</div>
+          <div class="stat-label">Days Remaining</div>
+        </div>
       </div>
-      <div class="progress-text" id="progress-text">0%</div>
-    </div>
 
-    <div class="year-milestones">
-      <div class="milestone">
-        <span class="milestone-date">Jan 1</span>
-        <span class="milestone-event">Year Begins</span>
+      <div class="progress-bar-container">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-text" id="progress-text">0%</div>
       </div>
-      <div class="milestone active" id="today-milestone">
-        <span class="milestone-date" id="milestone-today"></span>
-        <span class="milestone-event">Today</span>
+
+      <div class="year-milestones">
+        <div class="milestone">
+          <span class="milestone-date">Jan 1</span>
+          <span class="milestone-event">Year Begins</span>
+        </div>
+        <div class="milestone active" id="today-milestone">
+          <span class="milestone-date" id="milestone-today"></span>
+          <span class="milestone-event">Today</span>
+        </div>
+        <div class="milestone">
+          <span class="milestone-date">Dec 31</span>
+          <span class="milestone-event">Year Ends</span>
+        </div>
       </div>
-      <div class="milestone">
+
+      <div class="year-info">
+        <p id="year-message"></p>
+      </div>
     </div>
   </div>
 </div>
@@ -52,7 +60,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 9999;.modal-content
+  z-index: 9999;
   animation: fadeIn 0.3s ease;
 }
 
@@ -63,23 +71,13 @@
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 @keyframes slideIn {
-  from {
-    transform: translateY(-50px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(-50px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
 }
 
 .year-counter-overlay {
@@ -96,6 +94,13 @@
   position: relative;
   z-index: 10;
   animation: slideIn 0.4s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 1rem;
+  margin: 2rem 0;
 }
 
 .year-counter-close {
@@ -121,25 +126,6 @@
   color: #1f2937;
   transform: rotate(90deg);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
-}
-
-</   </div>
-
-    <div class="year-info">
-      <p id="year-message"></p>
-    </div>
-  </div>
-</div>
-
-<style>
-.year-counter-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 1rem;
-  margin: 2rem 0;
 }
 
 .year-counter-card {
@@ -273,52 +259,9 @@
 .year-info {
   text-align: center;
   padding: 1.5rem;
-function showYearCounterModal() {
-  const modal = document.getElementById('year-counter-modal');
-  if (modal) {
-    modal.classList.add('show');
-  }
 }
 
-function closeYearCounterModal() {
-  const modal = document.getElementById('year-counter-modal');
-  if (modal) {
-    modal.classList.remove('show');
-    // Store that user dismissed the modal in sessionStorage
-    sessionStorage.setItem('yearCounterDismissed', 'true');
-  }
-}
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-  initYearCounter();
-  
-  // Check if user has already dismissed the modal this session
-  const isDismissed = sessionStorage.getItem('yearCounterDismissed');
-  if (!isDismissed) {
-    // Show modal after a brief delay for better UX
-    setTimeout(showYearCounterModal, 500);
-  }
-  
-  // Attach close button listener
-  const closeBtn = document.getElementById('close-year-counter');
-  if (closeBtn) {
-    closeBtn.addEventListener('click', closeYearCounterModal);
-  }
-  
-  // Close modal when clicking on overlay
-  const overlay = document.querySelector('.year-counter-overlay');
-  if (overlay) {
-    overlay.addEventListener('click', closeYearCounterModal);
-  }
-  
-  // Close modal on Escape key
-  document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-      closeYearCounterModal();
-    }
-  });
-});year-info p {
+.year-info p {
   font-size: 0.875rem;
   color: #374151;
   margin: 0;
@@ -326,25 +269,11 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 @media (max-width: 640px) {
-  .year-counter-card {
-    padding: 1.5rem;
-  }
-
-  .year-counter-title {
-    font-size: 1.5rem;
-  }
-
-  .stat-number {
-    font-size: 1.875rem;
-  }
-
-  .stat-divider {
-    height: 50px;
-  }
-
-  .year-milestones {
-    margin: 1.5rem 0;
-  }
+  .year-counter-card    { padding: 1.5rem; }
+  .year-counter-title   { font-size: 1.5rem; }
+  .stat-number          { font-size: 1.875rem; }
+  .stat-divider         { height: 50px; }
+  .year-milestones      { margin: 1.5rem 0; }
 }
 </style>
 
@@ -354,65 +283,92 @@ function initYearCounter() {
   const year = now.getFullYear();
   const yearStart = new Date(year, 0, 1);
   const yearEnd = new Date(year, 11, 31);
-  
+
   const totalDaysInYear = Math.floor((yearEnd - yearStart) / (1000 * 60 * 60 * 24)) + 1;
   const daysPassed = Math.floor((now - yearStart) / (1000 * 60 * 60 * 24)) + 1;
   const daysRemaining = totalDaysInYear - daysPassed;
   const progressPercent = Math.round((daysPassed / totalDaysInYear) * 100);
-  
-  // Update DOM elements
+
+  const titleEl = document.getElementById('year-counter-title');
+  if (titleEl) titleEl.textContent = year + ' Progress';
+
   const dayPassedEl = document.getElementById('days-passed');
   const daysRemainingEl = document.getElementById('days-remaining');
   const progressFillEl = document.getElementById('progress-fill');
   const progressTextEl = document.getElementById('progress-text');
   const yearMessageEl = document.getElementById('year-message');
   const milestoneTodayEl = document.getElementById('milestone-today');
-  
+
   if (dayPassedEl) dayPassedEl.textContent = daysPassed;
   if (daysRemainingEl) daysRemainingEl.textContent = daysRemaining;
   if (progressFillEl) progressFillEl.style.width = progressPercent + '%';
   if (progressTextEl) progressTextEl.textContent = progressPercent + '%';
-  
+
   if (milestoneTodayEl) {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     milestoneTodayEl.textContent = months[now.getMonth()] + ' ' + now.getDate();
   }
-  
+
   if (yearMessageEl) {
     if (progressPercent < 25) {
-      yearMessageEl.textContent = '🎆 Happy New Year! Make it count!';
+      yearMessageEl.textContent = 'Happy New Year! Make it count!';
     } else if (progressPercent < 50) {
-      yearMessageEl.textContent = '💪 You\'re doing great! Keep the momentum going.';
+      yearMessageEl.textContent = 'You\'re doing great! Keep the momentum going.';
     } else if (progressPercent < 75) {
-      yearMessageEl.textContent = '🚀 Halfway through! You\'ve got this.';
-    } else if (progressPercent < 100) {
-      yearMessageEl.textContent = '✨ The year is almost over! Finish strong.';
+      yearMessageEl.textContent = 'Halfway through! You\'ve got this.';
     } else {
-      yearMessageEl.textContent = '🎉 You made it through the year!';
+      yearMessageEl.textContent = 'The year is almost over! Finish strong.';
     }
   }
 }
 
-// Initialize on page load
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initYearCounter);
-} else {
-  initYearCounter();
+function showYearCounterModal() {
+  const modal = document.getElementById('year-counter-modal');
+  if (modal) modal.classList.add('show');
 }
 
-// Update counter at midnight
+function closeYearCounterModal() {
+  const modal = document.getElementById('year-counter-modal');
+  if (modal) {
+    modal.classList.remove('show');
+    sessionStorage.setItem('yearCounterDismissed', 'true');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  initYearCounter();
+
+  const isDismissed = sessionStorage.getItem('yearCounterDismissed');
+  if (!isDismissed) {
+    setTimeout(showYearCounterModal, 500);
+  }
+
+  const closeBtn = document.getElementById('close-year-counter');
+  if (closeBtn) closeBtn.addEventListener('click', closeYearCounterModal);
+
+  const overlay = document.querySelector('.year-counter-overlay');
+  if (overlay) overlay.addEventListener('click', closeYearCounterModal);
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeYearCounterModal();
+  });
+});
+
 function scheduleNextUpdate() {
   const now = new Date();
   const tomorrow = new Date(now);
   tomorrow.setDate(tomorrow.getDate() + 1);
   tomorrow.setHours(0, 0, 0, 0);
-  
-  const timeUntilMidnight = tomorrow - now;
-  
   setTimeout(() => {
     initYearCounter();
     scheduleNextUpdate();
-  }, timeUntilMidnight);
+  }, tomorrow - now);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initYearCounter);
+} else {
+  initYearCounter();
 }
 
 scheduleNextUpdate();

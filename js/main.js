@@ -51,9 +51,14 @@ async function loadConfiguration() {
       };
       console.log('[config] Configuration loaded successfully');
 
-      // Initialize Auth0 if credentials are available
       if (config.auth0Domain && config.auth0ClientId) {
+        await loadAuth0SDK();
         await initializeAuth0();
+      }
+
+      if (config.llmApiUrl) {
+        const llmContainer = document.getElementById('llmChatContainer');
+        if (llmContainer) llmContainer.classList.remove('hidden');
       }
     } else {
       console.warn('[config] No auth-config.json found. Using defaults (features will be limited).');
@@ -61,6 +66,16 @@ async function loadConfiguration() {
   } catch (error) {
     console.warn('[config] Failed to load configuration:', error.message);
   }
+}
+
+function loadAuth0SDK() {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js';
+    script.onload = resolve;
+    script.onerror = () => reject(new Error('Failed to load Auth0 SDK'));
+    document.head.appendChild(script);
+  });
 }
 
 // ==============================================
@@ -164,16 +179,21 @@ function displayUserInfo(user) {
   const displayName = user.name || user.email || 'User';
   const emailInfo = user.email && user.email !== user.name ? ` (${user.email})` : '';
 
-  userInfoEl.innerHTML = `
-    Logged in as <b>${displayName}</b>${emailInfo}
-    <button id="logoutBtn" class="ml-2 text-blue-600 underline hover:text-blue-800">Logout</button>
-  `;
+  userInfoEl.textContent = '';
 
-  // Attach logout handler
-  const logoutBtn = document.getElementById('logoutBtn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', logout);
-  }
+  const label = document.createTextNode('Logged in as ');
+  const bold = document.createElement('b');
+  bold.textContent = displayName + emailInfo;
+
+  const logoutBtn = document.createElement('button');
+  logoutBtn.textContent = 'Logout';
+  logoutBtn.className = 'ml-2 text-blue-600 underline hover:text-blue-800';
+  logoutBtn.addEventListener('click', logout);
+
+  userInfoEl.appendChild(label);
+  userInfoEl.appendChild(bold);
+  userInfoEl.appendChild(document.createTextNode(' '));
+  userInfoEl.appendChild(logoutBtn);
 }
 
 async function logout() {
@@ -196,10 +216,15 @@ async function handleAuthCallback() {
     window.history.replaceState({}, document.title, '/');
     await handleAuthenticatedUser();
 
-    // Close login modal
     const loginModal = document.getElementById('loginModal');
     if (loginModal) {
       loginModal.classList.add('hidden');
+    }
+
+    const redirectUrl = sessionStorage.getItem('authRedirectUrl');
+    if (redirectUrl) {
+      sessionStorage.removeItem('authRedirectUrl');
+      window.location.href = redirectUrl;
     }
   } catch (error) {
     console.error('[auth] Auth callback error:', error);
@@ -242,7 +267,15 @@ function setupNavigation() {
 
   if (menuToggle && mobileMenu) {
     menuToggle.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
+      const isOpen = !mobileMenu.classList.contains('hidden');
+      if (isOpen) {
+        mobileMenu.classList.add('hidden');
+        mobileMenu.classList.remove('flex');
+      } else {
+        mobileMenu.classList.remove('hidden');
+        mobileMenu.classList.add('flex');
+      }
+      menuToggle.setAttribute('aria-expanded', String(!isOpen));
     });
   }
 
@@ -253,13 +286,24 @@ function setupNavigation() {
   if (desktopDropdownToggle && desktopDropdown) {
     desktopDropdownToggle.addEventListener('click', (e) => {
       e.preventDefault();
-      desktopDropdown.classList.toggle('hidden');
+      const isOpen = !desktopDropdown.classList.contains('hidden');
+      if (isOpen) {
+        desktopDropdown.classList.add('hidden');
+        desktopDropdown.classList.remove('flex');
+        desktopDropdownToggle.setAttribute('aria-expanded', 'false');
+      } else {
+        desktopDropdown.classList.remove('hidden');
+        desktopDropdown.classList.add('flex');
+        desktopDropdownToggle.setAttribute('aria-expanded', 'true');
+      }
     });
 
     // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
       if (!desktopDropdown.contains(e.target) && !desktopDropdownToggle.contains(e.target)) {
         desktopDropdown.classList.add('hidden');
+        desktopDropdown.classList.remove('flex');
+        desktopDropdownToggle.setAttribute('aria-expanded', 'false');
       }
     });
   }
@@ -270,7 +314,14 @@ function setupNavigation() {
 
   if (mobileDropdownToggle && mobileDropdown) {
     mobileDropdownToggle.addEventListener('click', () => {
-      mobileDropdown.classList.toggle('hidden');
+      const isOpen = !mobileDropdown.classList.contains('hidden');
+      if (isOpen) {
+        mobileDropdown.classList.add('hidden');
+        mobileDropdown.classList.remove('flex');
+      } else {
+        mobileDropdown.classList.remove('hidden');
+        mobileDropdown.classList.add('flex');
+      }
     });
   }
 }
@@ -304,6 +355,7 @@ function closeAllModals() {
     const modal = document.getElementById(id);
     if (modal && !modal.classList.contains('hidden')) {
       modal.classList.add('hidden');
+      modal.classList.remove('flex');
     }
   });
 
@@ -319,6 +371,9 @@ function closeAllModals() {
 
 // Global function for redirecting to login (used in HTML onclick)
 window.redirectToLogin = function(targetUrl) {
+  if (targetUrl) {
+    sessionStorage.setItem('authRedirectUrl', targetUrl);
+  }
   const loginModal = document.getElementById('loginModal');
   if (loginModal) {
     loginModal.classList.remove('hidden');
@@ -466,21 +521,17 @@ function setupCountdown() {
   if (!countdownEl) return;
 
   function updateCountdown() {
-    const target = new Date('2026-01-01T00:00:00');
     const now = new Date();
+    const nextYear = now.getFullYear() + 1;
+    const target = new Date(nextYear, 0, 1);
     const diff = target - now;
-
-    if (diff <= 0) {
-      countdownEl.textContent = '2026 is here!';
-      return;
-    }
 
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
     const minutes = Math.floor((diff / (1000 * 60)) % 60);
     const seconds = Math.floor((diff / 1000) % 60);
 
-    countdownEl.textContent = `Countdown to 2026: ${days}d ${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+    countdownEl.textContent = `${days}d ${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s until ${nextYear}`;
   }
 
   updateCountdown();
