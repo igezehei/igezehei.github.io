@@ -51,18 +51,18 @@
     </div>
   </nav>
 
-  <div id="mobileMenu" class="md:hidden hidden flex-col absolute top-20 left-0 w-full bg-white shadow-md px-6 py-4 z-40">
-    <a href="#" class="text-black font-medium hover:text-blue-600">Home</a>
-    <div class="relative">
-      <button id="mobileDropdownToggle" class="text-black font-medium hover:text-blue-600 w-full text-left">Past Work ▾</button>
-      <div id="mobileDropdown" class="hidden flex-col mt-2 space-y-2">
-        <a class="text-black font-medium hover:text-blue-600" href="https://igezehei.github.io/fintech-101/">Fintech</a>
-        <a class="text-black font-medium hover:text-blue-600" href="#" onclick="redirectToLogin('https://igezehei.github.io/supply-chain/')">Supply Chain</a>
-        <a class="text-black font-medium hover:text-blue-600" href="#" onclick="redirectToLogin('https://igezehei.github.io/artificial-intelligence/')">Artificial Intelligence</a>
-        <a class="text-black font-medium hover:text-blue-600" href="#" onclick="redirectToLogin('https://igezehei.github.io/quantum-computing/')">Quantum Computing</a>
+  <div id="mobileMenu" class="md:hidden hidden flex-col fixed top-16 left-0 w-full bg-white shadow-md px-6 py-4 z-40 max-h-[calc(100vh-64px)] overflow-y-auto">
+    <a href="#" class="block py-2 text-black font-medium hover:text-blue-600">Home</a>
+    <div>
+      <button id="mobileDropdownToggle" class="block py-2 w-full text-left text-black font-medium hover:text-blue-600" aria-expanded="false">Past Work ▾</button>
+      <div id="mobileDropdown" class="hidden flex-col pl-4 border-l-2 border-gray-200">
+        <a class="block py-2 text-black font-medium hover:text-blue-600" href="https://igezehei.github.io/fintech-101/">Fintech</a>
+        <a class="block py-2 text-black font-medium hover:text-blue-600" href="#" onclick="redirectToLogin('https://igezehei.github.io/supply-chain/', event)">Supply Chain</a>
+        <a class="block py-2 text-black font-medium hover:text-blue-600" href="#" onclick="redirectToLogin('https://igezehei.github.io/artificial-intelligence/', event)">Artificial Intelligence</a>
+        <a class="block py-2 text-black font-medium hover:text-blue-600" href="#" onclick="redirectToLogin('https://igezehei.github.io/quantum-computing/', event)">Quantum Computing</a>
       </div>
     </div>
-    <a href="#contact-section" class="text-black font-medium hover:text-blue-600">Contact</a>
+    <a href="#contact-section" class="block py-2 text-black font-medium hover:text-blue-600">Contact</a>
   </div>
 
   <section class="bg-white py-20 text-center px-6">

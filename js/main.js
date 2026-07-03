@@ -318,10 +318,20 @@ function setupNavigation() {
       if (isOpen) {
         mobileDropdown.classList.add('hidden');
         mobileDropdown.classList.remove('flex');
+        mobileDropdownToggle.setAttribute('aria-expanded', 'false');
       } else {
         mobileDropdown.classList.remove('hidden');
         mobileDropdown.classList.add('flex');
+        mobileDropdownToggle.setAttribute('aria-expanded', 'true');
       }
+    });
+  }
+
+  // Close mobile menu when plain nav links are tapped
+  const mobileMenuEl = document.getElementById('mobileMenu');
+  if (mobileMenuEl) {
+    mobileMenuEl.querySelectorAll('a[href]:not([onclick])').forEach(link => {
+      link.addEventListener('click', closeMobileMenu);
     });
   }
 }
@@ -350,14 +360,11 @@ function setupModals() {
 }
 
 function closeAllModals() {
-  const modals = ['loginModal', 'mobileMenu'];
-  modals.forEach(id => {
-    const modal = document.getElementById(id);
-    if (modal && !modal.classList.contains('hidden')) {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-  });
+  const loginModal = document.getElementById('loginModal');
+  if (loginModal && !loginModal.classList.contains('hidden')) {
+    loginModal.classList.add('hidden');
+  }
+  closeMobileMenu();
 
   // Close dropdowns
   const dropdowns = ['desktopDropdown', 'aiTrendsTooltip'];
@@ -370,15 +377,34 @@ function closeAllModals() {
 }
 
 // Global function for redirecting to login (used in HTML onclick)
-window.redirectToLogin = function(targetUrl) {
+window.redirectToLogin = function(targetUrl, e) {
+  if (e) e.preventDefault();
   if (targetUrl) {
     sessionStorage.setItem('authRedirectUrl', targetUrl);
   }
+  closeMobileMenu();
   const loginModal = document.getElementById('loginModal');
   if (loginModal) {
     loginModal.classList.remove('hidden');
   }
 };
+
+function closeMobileMenu() {
+  const mobileMenu = document.getElementById('mobileMenu');
+  const menuToggle = document.getElementById('menuToggle');
+  const mobileDropdown = document.getElementById('mobileDropdown');
+  const mobileDropdownToggle = document.getElementById('mobileDropdownToggle');
+  if (mobileMenu) {
+    mobileMenu.classList.add('hidden');
+    mobileMenu.classList.remove('flex');
+  }
+  if (menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
+  if (mobileDropdown) {
+    mobileDropdown.classList.add('hidden');
+    mobileDropdown.classList.remove('flex');
+  }
+  if (mobileDropdownToggle) mobileDropdownToggle.setAttribute('aria-expanded', 'false');
+}
 
 // ==============================================
 // LLM Chat
