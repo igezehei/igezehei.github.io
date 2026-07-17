@@ -1,6 +1,7 @@
 {
-  "auth0Domain": "dev-xxxxxx.us.auth0.com",
+  "auth0Domain": "YOUR_TENANT.auth0.com",
   "auth0ClientId": "YOUR_AUTH0_CLIENT_ID",
+  "firebaseUrl": "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
   "webhookUrl": "https://your-webhook-url.example.com/log-login",
   "llmApiUrl": "https://your-notebook-llm-api.example.com/query"
 }

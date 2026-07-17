@@ -1,14 +1,16 @@
 // Main JavaScript for Portfolio Site
-// Handles UI interactions, Auth0, LLM chat, and navigation
+// Handles UI interactions, Auth0 Sign-In, visitor tracking, and navigation
 
 // ==============================================
 // Configuration and State
 // ==============================================
 
 let auth0Client = null;
+let currentUser = null;
 let config = {
   auth0Domain: null,
   auth0ClientId: null,
+  firebaseUrl: null,
   webhookUrl: null,
   llmApiUrl: null
 };
@@ -20,10 +22,8 @@ let config = {
 document.addEventListener('DOMContentLoaded', function() {
   console.log('[init] Initializing portfolio site...');
 
-  // Load configuration and initialize features
   loadConfiguration();
 
-  // Setup UI components
   setupNavigation();
   setupModals();
   setupCountdown();
@@ -44,54 +44,54 @@ async function loadConfiguration() {
     if (response.ok) {
       const data = await response.json();
       config = {
-        auth0Domain: data.auth0Domain,
-        auth0ClientId: data.auth0ClientId,
+        auth0Domain: data.auth0Domain || null,
+        auth0ClientId: data.auth0ClientId || null,
+        firebaseUrl: data.firebaseUrl || null,
         webhookUrl: data.webhookUrl || null,
         llmApiUrl: data.llmApiUrl || null
       };
       console.log('[config] Configuration loaded successfully');
 
       if (config.auth0Domain && config.auth0ClientId) {
-        await loadAuth0SDK();
-        await initializeAuth0();
+        await initAuth0();
+      } else {
+        document.getElementById('auth0SignInError')?.classList.remove('hidden');
+        // Restore session from localStorage when Auth0 isn't configured
+        const savedUser = localStorage.getItem('portfolioUser');
+        if (savedUser) {
+          try {
+            currentUser = JSON.parse(savedUser);
+            displayUserInfo(currentUser);
+          } catch (e) {
+            localStorage.removeItem('portfolioUser');
+          }
+        }
+      }
+
+      if (config.firebaseUrl) {
+        trackPageVisit();
+        updateVisitorCountDisplay();
       }
 
       if (config.llmApiUrl) {
-        const llmContainer = document.getElementById('llmChatContainer');
-        if (llmContainer) llmContainer.classList.remove('hidden');
+        document.getElementById('llmChatContainer')?.classList.remove('hidden');
       }
     } else {
-      console.warn('[config] No auth-config.json found. Using defaults (features will be limited).');
+      console.warn('[config] No auth-config.json found. Features will be limited.');
+      document.getElementById('auth0SignInError')?.classList.remove('hidden');
     }
   } catch (error) {
     console.warn('[config] Failed to load configuration:', error.message);
   }
 }
 
-function loadAuth0SDK() {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js';
-    script.onload = resolve;
-    script.onerror = () => reject(new Error('Failed to load Auth0 SDK'));
-    document.head.appendChild(script);
-  });
-}
-
 // ==============================================
-// Auth0 Integration
+// Auth0
 // ==============================================
 
-async function initializeAuth0() {
+async function initAuth0() {
   try {
-    // Check if Auth0 SDK is loaded
-    if (typeof auth0 === 'undefined' || typeof auth0.createAuth0Client === 'undefined') {
-      console.error('[auth] Auth0 SDK not loaded');
-      return;
-    }
-
-    // Create Auth0 client
-    auth0Client = await auth0.createAuth0Client({
+    auth0Client = await window.auth0.createAuth0Client({
       domain: config.auth0Domain,
       clientId: config.auth0ClientId,
       authorizationParams: {
@@ -99,160 +99,220 @@ async function initializeAuth0() {
       }
     });
 
-    console.log('[auth] Auth0 client initialized');
+    // Handle redirect callback after Auth0 Universal Login
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('code') && params.has('state')) {
+      try {
+        const result = await auth0Client.handleRedirectCallback();
+        window.history.replaceState({}, document.title, window.location.pathname);
+        const user = await auth0Client.getUser();
+        onSignedIn(user, result.appState?.returnTo);
+      } catch (e) {
+        console.error('[auth0] Redirect callback failed:', e);
+      }
+      return;
+    }
 
-    // Setup login button handlers
-    setupAuthButtons();
-
-    // Check if user is authenticated
+    // Check for an active Auth0 session
     const isAuthenticated = await auth0Client.isAuthenticated();
     if (isAuthenticated) {
-      await handleAuthenticatedUser();
+      const user = await auth0Client.getUser();
+      onSignedIn(user);
+      return;
     }
 
-    // Handle OAuth callback
-    if (window.location.search.includes('code=') && window.location.search.includes('state=')) {
-      await handleAuthCallback();
+    // Fallback: restore from localStorage for page refreshes
+    const savedUser = localStorage.getItem('portfolioUser');
+    if (savedUser) {
+      try {
+        currentUser = JSON.parse(savedUser);
+        displayUserInfo(currentUser);
+      } catch (e) {
+        localStorage.removeItem('portfolioUser');
+      }
     }
-  } catch (error) {
-    console.error('[auth] Failed to initialize Auth0:', error);
+  } catch (err) {
+    console.error('[auth0] Initialization failed:', err);
+    document.getElementById('auth0SignInError')?.classList.remove('hidden');
   }
 }
 
-function setupAuthButtons() {
-  const authButtons = [
-    { id: 'loginGoogle', connection: 'google-oauth2' },
-    { id: 'loginGithub', connection: 'github' },
-    { id: 'loginLinkedin', connection: 'linkedin' }
-  ];
+function onSignedIn(auth0User, returnTo) {
+  currentUser = {
+    name: auth0User.name,
+    email: auth0User.email,
+    picture: auth0User.picture,
+    provider: auth0User.sub ? auth0User.sub.split('|')[0] : 'auth0'
+  };
 
-  authButtons.forEach(({ id, connection }) => {
-    const button = document.getElementById(id);
-    if (button) {
-      button.addEventListener('click', (e) => {
-        e.preventDefault();
-        loginWithConnection(connection);
-      });
-    }
-  });
+  localStorage.setItem('portfolioUser', JSON.stringify(currentUser));
+
+  if (config.firebaseUrl) trackLogin(currentUser);
+  if (config.webhookUrl) sendLoginEvent(currentUser);
+
+  displayUserInfo(currentUser);
+  document.getElementById('loginModal')?.classList.add('hidden');
+
+  if (returnTo) {
+    window.location.href = returnTo;
+  }
 }
 
-async function loginWithConnection(connection) {
+window.login = async function(targetUrl) {
   if (!auth0Client) {
-    showAuthError('Authentication not configured. Please contact the site administrator.');
+    document.getElementById('loginModal')?.classList.remove('hidden');
     return;
   }
+  await auth0Client.loginWithRedirect({
+    appState: { returnTo: targetUrl || null }
+  });
+};
 
-  try {
-    await auth0Client.loginWithRedirect({
-      authorizationParams: {
-        connection: connection,
-        redirect_uri: window.location.origin
-      }
+async function logout() {
+  currentUser = null;
+  localStorage.removeItem('portfolioUser');
+
+  const userInfoEl = document.getElementById('userInfo');
+  if (userInfoEl) userInfoEl.textContent = '';
+
+  ['userNavInfo', 'userNavInfoMobile'].forEach(id => {
+    document.getElementById(id)?.classList.add('hidden');
+    document.getElementById(id)?.classList.remove('flex');
+  });
+  ['loginNavBtn', 'loginNavBtnMobile'].forEach(id => {
+    document.getElementById(id)?.classList.remove('hidden');
+  });
+
+  if (auth0Client) {
+    await auth0Client.logout({
+      logoutParams: { returnTo: window.location.origin }
     });
-  } catch (error) {
-    console.error('[auth] Login failed:', error);
-    showAuthError('Login failed. Please try again.');
-  }
-}
-
-async function handleAuthenticatedUser() {
-  try {
-    const user = await auth0Client.getUser();
-    if (user) {
-      displayUserInfo(user);
-
-      // Send to webhook if configured
-      if (config.webhookUrl) {
-        sendLoginEvent(user);
-      }
-    }
-  } catch (error) {
-    console.error('[auth] Error handling authenticated user:', error);
   }
 }
 
 function displayUserInfo(user) {
+  // Footer display
   const userInfoEl = document.getElementById('userInfo');
-  if (!userInfoEl) return;
-
-  const displayName = user.name || user.email || 'User';
-  const emailInfo = user.email && user.email !== user.name ? ` (${user.email})` : '';
-
-  userInfoEl.textContent = '';
-
-  const label = document.createTextNode('Logged in as ');
-  const bold = document.createElement('b');
-  bold.textContent = displayName + emailInfo;
-
-  const logoutBtn = document.createElement('button');
-  logoutBtn.textContent = 'Logout';
-  logoutBtn.className = 'ml-2 text-blue-600 underline hover:text-blue-800';
-  logoutBtn.addEventListener('click', logout);
-
-  userInfoEl.appendChild(label);
-  userInfoEl.appendChild(bold);
-  userInfoEl.appendChild(document.createTextNode(' '));
-  userInfoEl.appendChild(logoutBtn);
-}
-
-async function logout() {
-  if (!auth0Client) return;
-
-  try {
-    await auth0Client.logout({
-      logoutParams: {
-        returnTo: window.location.origin
-      }
-    });
-  } catch (error) {
-    console.error('[auth] Logout failed:', error);
+  if (userInfoEl) {
+    userInfoEl.textContent = '';
+    const label = document.createTextNode('Logged in as ');
+    const bold = document.createElement('b');
+    bold.textContent = user.name || user.email;
+    const logoutBtn = document.createElement('button');
+    logoutBtn.textContent = 'Logout';
+    logoutBtn.className = 'ml-2 text-blue-600 underline hover:text-blue-800';
+    logoutBtn.addEventListener('click', logout);
+    userInfoEl.appendChild(label);
+    userInfoEl.appendChild(bold);
+    userInfoEl.appendChild(document.createTextNode(' '));
+    userInfoEl.appendChild(logoutBtn);
   }
-}
 
-async function handleAuthCallback() {
-  try {
-    await auth0Client.handleRedirectCallback();
-    window.history.replaceState({}, document.title, '/');
-    await handleAuthenticatedUser();
+  // Desktop nav
+  const navInfo = document.getElementById('userNavInfo');
+  const navName = document.getElementById('userNavName');
+  const navAvatar = document.getElementById('userNavAvatar');
+  const loginNavBtn = document.getElementById('loginNavBtn');
+  if (navInfo) { navInfo.classList.remove('hidden'); navInfo.classList.add('flex'); }
+  if (navName) navName.textContent = user.name || user.email;
+  if (navAvatar && user.picture) { navAvatar.src = user.picture; navAvatar.classList.remove('hidden'); }
+  if (loginNavBtn) loginNavBtn.classList.add('hidden');
 
-    const loginModal = document.getElementById('loginModal');
-    if (loginModal) {
-      loginModal.classList.add('hidden');
-    }
-
-    const redirectUrl = sessionStorage.getItem('authRedirectUrl');
-    if (redirectUrl) {
-      sessionStorage.removeItem('authRedirectUrl');
-      window.location.href = redirectUrl;
-    }
-  } catch (error) {
-    console.error('[auth] Auth callback error:', error);
-  }
+  // Mobile nav
+  const mobileNavInfo = document.getElementById('userNavInfoMobile');
+  const mobileNavName = document.getElementById('userNavNameMobile');
+  const loginNavBtnMobile = document.getElementById('loginNavBtnMobile');
+  if (mobileNavInfo) mobileNavInfo.classList.remove('hidden');
+  if (mobileNavName) mobileNavName.textContent = user.name || user.email;
+  if (loginNavBtnMobile) loginNavBtnMobile.classList.add('hidden');
 }
 
 function sendLoginEvent(user) {
   if (!config.webhookUrl) return;
-
   fetch(config.webhookUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       name: user.name,
       email: user.email,
-      sub: user.sub,
-      provider: user.sub ? user.sub.split('|')[0] : null,
+      provider: user.provider,
       timestamp: new Date().toISOString()
     })
-  }).catch(error => {
-    console.warn('[auth] Failed to send login event:', error);
-  });
+  }).catch(err => console.warn('[auth] Webhook failed:', err.message));
 }
 
-function showAuthError(message) {
-  const userInfoEl = document.getElementById('userInfo');
-  if (userInfoEl) {
-    userInfoEl.innerHTML = `<span class="text-red-600">${message}</span>`;
+// ==============================================
+// Visitor Tracking (Firebase Realtime Database)
+// ==============================================
+
+async function trackPageVisit() {
+  if (!config.firebaseUrl || sessionStorage.getItem('visitTracked')) return;
+  sessionStorage.setItem('visitTracked', '1');
+
+  try {
+    await fetch(`${config.firebaseUrl}/visits.json`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ts: new Date().toISOString() })
+    });
+  } catch (e) {
+    console.warn('[tracking] Failed to track visit:', e.message);
+  }
+}
+
+async function trackContentAccess() {
+  if (!config.firebaseUrl || sessionStorage.getItem('accessTracked')) return;
+  sessionStorage.setItem('accessTracked', '1');
+
+  try {
+    await fetch(`${config.firebaseUrl}/content_access.json`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ts: new Date().toISOString() })
+    });
+    updateVisitorCountDisplay();
+  } catch (e) {
+    console.warn('[tracking] Failed to track access:', e.message);
+  }
+}
+
+async function trackLogin(user) {
+  if (!config.firebaseUrl) return;
+
+  try {
+    await fetch(`${config.firebaseUrl}/logins.json`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: user.email, ts: new Date().toISOString() })
+    });
+    updateVisitorCountDisplay();
+  } catch (e) {
+    console.warn('[tracking] Failed to track login:', e.message);
+  }
+}
+
+async function updateVisitorCountDisplay() {
+  if (!config.firebaseUrl) return;
+
+  try {
+    const [accessRes, loginRes] = await Promise.all([
+      fetch(`${config.firebaseUrl}/content_access.json?shallow=true`),
+      fetch(`${config.firebaseUrl}/logins.json?shallow=true`)
+    ]);
+
+    const accessData = await accessRes.json();
+    const loginData = await loginRes.json();
+
+    const accessCount = accessData && typeof accessData === 'object' ? Object.keys(accessData).length : 0;
+    const loginCount = loginData && typeof loginData === 'object' ? Object.keys(loginData).length : 0;
+
+    const counterEl = document.getElementById('visitorCounter');
+    if (counterEl) {
+      counterEl.textContent = `${accessCount} visitor${accessCount !== 1 ? 's' : ''} · ${loginCount} sign-in${loginCount !== 1 ? 's' : ''}`;
+      counterEl.classList.remove('hidden');
+    }
+  } catch (e) {
+    console.warn('[tracking] Failed to load counts:', e.message);
   }
 }
 
@@ -298,7 +358,6 @@ function setupNavigation() {
       }
     });
 
-    // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
       if (!desktopDropdown.contains(e.target) && !desktopDropdownToggle.contains(e.target)) {
         desktopDropdown.classList.add('hidden');
@@ -327,6 +386,20 @@ function setupNavigation() {
     });
   }
 
+  // Login buttons (desktop + mobile) trigger Auth0 Universal Login
+  ['loginNavBtn', 'loginNavBtnMobile'].forEach(id => {
+    document.getElementById(id)?.addEventListener('click', () => {
+      closeMobileMenu();
+      trackContentAccess();
+      login();
+    });
+  });
+
+  // Logout buttons (desktop + mobile)
+  ['logoutNavBtn', 'logoutNavBtnMobile'].forEach(id => {
+    document.getElementById(id)?.addEventListener('click', logout);
+  });
+
   // Close mobile menu when plain nav links are tapped
   const mobileMenuEl = document.getElementById('mobileMenu');
   if (mobileMenuEl) {
@@ -341,7 +414,6 @@ function setupNavigation() {
 // ==============================================
 
 function setupModals() {
-  // Login modal
   const closeLoginModal = document.getElementById('closeLoginModal');
   const loginModal = document.getElementById('loginModal');
 
@@ -351,42 +423,33 @@ function setupModals() {
     });
   }
 
-  // Global keyboard handler: Escape closes modals
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      closeAllModals();
-    }
+    if (e.key === 'Escape') closeAllModals();
   });
 }
 
 function closeAllModals() {
-  const loginModal = document.getElementById('loginModal');
-  if (loginModal && !loginModal.classList.contains('hidden')) {
-    loginModal.classList.add('hidden');
-  }
+  document.getElementById('loginModal')?.classList.add('hidden');
   closeMobileMenu();
 
-  // Close dropdowns
-  const dropdowns = ['desktopDropdown', 'aiTrendsTooltip'];
-  dropdowns.forEach(id => {
-    const dropdown = document.getElementById(id);
-    if (dropdown && !dropdown.classList.contains('hidden')) {
-      dropdown.classList.add('hidden');
-    }
+  ['desktopDropdown', 'aiTrendsTooltip'].forEach(id => {
+    document.getElementById(id)?.classList.add('hidden');
   });
 }
 
-// Global function for redirecting to login (used in HTML onclick)
 window.redirectToLogin = function(targetUrl, e) {
   if (e) e.preventDefault();
-  if (targetUrl) {
-    sessionStorage.setItem('authRedirectUrl', targetUrl);
+
+  // Already logged in — go straight to content
+  if (currentUser) {
+    closeMobileMenu();
+    if (targetUrl) window.location.href = targetUrl;
+    return;
   }
+
   closeMobileMenu();
-  const loginModal = document.getElementById('loginModal');
-  if (loginModal) {
-    loginModal.classList.remove('hidden');
-  }
+  trackContentAccess();
+  login(targetUrl);
 };
 
 function closeMobileMenu() {
@@ -394,15 +457,9 @@ function closeMobileMenu() {
   const menuToggle = document.getElementById('menuToggle');
   const mobileDropdown = document.getElementById('mobileDropdown');
   const mobileDropdownToggle = document.getElementById('mobileDropdownToggle');
-  if (mobileMenu) {
-    mobileMenu.classList.add('hidden');
-    mobileMenu.classList.remove('flex');
-  }
+  if (mobileMenu) { mobileMenu.classList.add('hidden'); mobileMenu.classList.remove('flex'); }
   if (menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
-  if (mobileDropdown) {
-    mobileDropdown.classList.add('hidden');
-    mobileDropdown.classList.remove('flex');
-  }
+  if (mobileDropdown) { mobileDropdown.classList.add('hidden'); mobileDropdown.classList.remove('flex'); }
   if (mobileDropdownToggle) mobileDropdownToggle.setAttribute('aria-expanded', 'false');
 }
 
@@ -420,15 +477,9 @@ function setupLLMChat() {
     return;
   }
 
-  // Send button click
   chatSend.addEventListener('click', () => sendLLMMessage());
-
-  // Enter key to send
   chatInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      sendLLMMessage();
-    }
+    if (e.key === 'Enter') { e.preventDefault(); sendLLMMessage(); }
   });
 }
 
@@ -440,24 +491,18 @@ function sendLLMMessage() {
   const query = chatInput.value.trim();
   if (!query) return;
 
-  // Add user message
   appendMessage('user', query);
   chatInput.value = '';
 
-  // Check if LLM API is configured
   if (!config.llmApiUrl) {
     appendMessage('llm', 'LLM chat is not configured. This is a demo feature. To enable it, add "llmApiUrl" to your auth-config.json file.');
     return;
   }
 
-  // Add "thinking" message
   appendMessage('llm', 'Thinking...');
-
-  // Disable inputs while waiting
   chatSend.disabled = true;
   chatInput.disabled = true;
 
-  // Query LLM API
   fetch(config.llmApiUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -465,16 +510,12 @@ function sendLLMMessage() {
   })
   .then(res => res.json())
   .then(data => {
-    // Remove "thinking" message
     chatHistory.lastChild.remove();
-    // Add response
     appendMessage('llm', data.answer || 'No answer received.');
   })
   .catch(error => {
     console.error('[llm] Query failed:', error);
-    // Remove "thinking" message
     chatHistory.lastChild.remove();
-    // Show error
     appendMessage('llm', 'Error: Unable to connect to LLM service. Please try again later.');
   })
   .finally(() => {
@@ -489,25 +530,15 @@ function appendMessage(sender, text) {
   if (!chatHistory) return;
 
   const msgDiv = document.createElement('div');
-  msgDiv.className = sender === 'user'
-    ? 'text-right'
-    : 'text-left bg-blue-50 rounded px-3 py-2';
-
+  msgDiv.className = sender === 'user' ? 'text-right' : 'text-left bg-blue-50 rounded px-3 py-2';
   const senderName = sender === 'user' ? 'You' : 'Issak LLM';
   msgDiv.innerHTML = `<span class="font-semibold">${senderName}:</span> ${escapeHtml(text)}`;
-
   chatHistory.appendChild(msgDiv);
   chatHistory.scrollTop = chatHistory.scrollHeight;
 }
 
 function escapeHtml(text) {
-  const map = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;'
-  };
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
   return text.replace(/[&<>"']/g, m => map[m]);
 }
 
@@ -516,25 +547,14 @@ function escapeHtml(text) {
 // ==============================================
 
 function setupTooltips() {
-  const aiTrendsTipBtn = document.getElementById('aiTrendsTipBtn');
-  const aiTrendsTooltip = document.getElementById('aiTrendsTooltip');
+  const btn = document.getElementById('aiTrendsTipBtn');
+  const tooltip = document.getElementById('aiTrendsTooltip');
 
-  if (aiTrendsTipBtn && aiTrendsTooltip) {
-    aiTrendsTipBtn.addEventListener('mouseenter', () => {
-      aiTrendsTooltip.classList.remove('hidden');
-    });
-
-    aiTrendsTipBtn.addEventListener('mouseleave', () => {
-      aiTrendsTooltip.classList.add('hidden');
-    });
-
-    aiTrendsTipBtn.addEventListener('focus', () => {
-      aiTrendsTooltip.classList.remove('hidden');
-    });
-
-    aiTrendsTipBtn.addEventListener('blur', () => {
-      aiTrendsTooltip.classList.add('hidden');
-    });
+  if (btn && tooltip) {
+    btn.addEventListener('mouseenter', () => tooltip.classList.remove('hidden'));
+    btn.addEventListener('mouseleave', () => tooltip.classList.add('hidden'));
+    btn.addEventListener('focus', () => tooltip.classList.remove('hidden'));
+    btn.addEventListener('blur', () => tooltip.classList.add('hidden'));
   }
 }
 
@@ -548,16 +568,13 @@ function setupCountdown() {
 
   function updateCountdown() {
     const now = new Date();
-    const nextYear = now.getFullYear() + 1;
-    const target = new Date(nextYear, 0, 1);
+    const target = new Date(now.getFullYear() + 1, 0, 1);
     const diff = target - now;
-
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
     const minutes = Math.floor((diff / (1000 * 60)) % 60);
     const seconds = Math.floor((diff / 1000) % 60);
-
-    countdownEl.textContent = `${days}d ${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s until ${nextYear}`;
+    countdownEl.textContent = `${days}d ${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s until ${now.getFullYear() + 1}`;
   }
 
   updateCountdown();
@@ -571,7 +588,6 @@ function setupCountdown() {
 function setCopyrightYear() {
   const yearEl = document.getElementById('copyrightYear');
   if (yearEl) {
-    const year = new Date().getFullYear();
-    yearEl.innerHTML = `&copy; ${year} Issak Gezehei. All rights reserved.`;
+    yearEl.innerHTML = `&copy; ${new Date().getFullYear()} Issak Gezehei. All rights reserved.`;
   }
 }

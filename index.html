@@ -29,6 +29,7 @@
 
   <title>Issak Gezehei - Product Leader & AI Strategist</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
 </head>
 <body class="font-sans text-gray-800 bg-gray-50">
   <nav class="fixed top-0 left-0 w-full bg-white shadow-md z-50 flex justify-between items-center px-6 py-4" role="navigation" aria-label="Main navigation">
@@ -48,6 +49,12 @@
         </div>
       </div>
       <a href="#contact-section" class="text-black font-medium hover:text-blue-600 transition-colors">Contact</a>
+      <button id="loginNavBtn" class="text-black font-medium hover:text-blue-600 transition-colors px-3 py-1 border border-gray-300 rounded-md text-sm">Login</button>
+      <div id="userNavInfo" class="hidden items-center gap-2">
+        <img id="userNavAvatar" src="" alt="" class="hidden w-7 h-7 rounded-full border border-gray-200" onerror="this.classList.add('hidden')" />
+        <span id="userNavName" class="text-black font-medium text-sm"></span>
+        <button id="logoutNavBtn" class="text-blue-600 hover:underline text-sm">Logout</button>
+      </div>
     </div>
   </nav>
 
@@ -63,6 +70,11 @@
       </div>
     </div>
     <a href="#contact-section" class="block py-2 text-black font-medium hover:text-blue-600">Contact</a>
+    <button id="loginNavBtnMobile" class="block py-2 w-full text-left text-black font-medium hover:text-blue-600">Login</button>
+    <div id="userNavInfoMobile" class="hidden py-2 flex items-center gap-2">
+      <span id="userNavNameMobile" class="text-black font-medium text-sm"></span>
+      <button id="logoutNavBtnMobile" class="text-blue-600 hover:underline text-sm">Logout</button>
+    </div>
   </div>
 
   <section class="bg-white py-20 text-center px-6">
@@ -231,20 +243,18 @@
   </footer>
 
   <div id="loginModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-96">
-      <h2 id="loginModalTitle" class="text-xl font-bold mb-4">Login</h2>
-      <div class="space-y-4">
-        <button id="loginGoogle" class="w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600 flex items-center justify-center gap-2">
-          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" class="h-5 w-5"> Login with Google
-        </button>
-        <button id="loginGithub" class="w-full bg-gray-800 text-white py-2 rounded-md hover:bg-gray-900 flex items-center justify-center gap-2">
-          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub" class="h-5 w-5"> Login with GitHub
-        </button>
-        <button id="loginLinkedin" class="w-full bg-blue-700 text-white py-2 rounded-md hover:bg-blue-800 flex items-center justify-center gap-2">
-          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg" alt="LinkedIn" class="h-5 w-5"> Login with LinkedIn
-        </button>
+    <div class="bg-white rounded-lg shadow-lg p-6 w-96 max-w-full">
+      <h2 id="loginModalTitle" class="text-xl font-bold mb-2">Sign in to view content</h2>
+      <p class="text-sm text-gray-500 mb-5">Sign in to access past work and projects.</p>
+      <button id="auth0SignInButton" onclick="login()" class="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium py-3 px-4 rounded-lg transition-colors mb-4">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        Continue with Auth0
+      </button>
+      <div id="auth0SignInError" class="hidden text-red-600 text-sm text-center mb-4 px-2">
+        Authentication is not configured. Please contact the site administrator.
       </div>
-      <button id="closeLoginModal" class="mt-6 text-blue-600 hover:underline" aria-label="Close login modal">Close</button>
+      <p id="visitorCounter" class="hidden text-center text-xs text-gray-400 mb-4"></p>
+      <button id="closeLoginModal" class="w-full text-center text-blue-600 hover:underline text-sm" aria-label="Close login modal">Close</button>
     </div>
   </div>
 
